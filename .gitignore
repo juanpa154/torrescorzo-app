@@ -1,0 +1,11 @@
+# Node modules y archivos generados
+node_modules/
+dist/
+build/
+
+# Archivos de configuración
+.env
+
+# Archivos del sistema y editor
+.DS_Store
+.vscode/
