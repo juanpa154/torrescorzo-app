@@ -6,12 +6,20 @@ const {
   
   const create = async (req, res) => {
     const { title, content } = req.body;
-    const userId = req.user.id;
-    if (!title || !content) return res.status(400).json({ message: 'Faltan datos' });
+    const user = req.user;
   
-    const announcement = await createAnnouncement({ title, content, userId });
+    if (user.role === "viewer") {
+      return res.status(403).json({ message: "No tienes permisos para crear anuncios." });
+    }
+  
+    if (!title || !content) {
+      return res.status(400).json({ message: "Faltan datos" });
+    }
+  
+    const announcement = await createAnnouncement({ title, content, userId: user.id });
     res.status(201).json(announcement);
   };
+  
   
   const list = async (_req, res) => {
     const announcements = await getAllAnnouncements();

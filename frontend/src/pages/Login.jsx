@@ -1,17 +1,21 @@
 import { useState } from "react";
 import { login } from "../services/api";
+import { useNavigate } from "react-router-dom";
+
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
+  const navigate = useNavigate();
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     const res = await login(email, password);
     if (res.token) {
       localStorage.setItem("token", res.token);
-      setMessage("Login exitoso");
+      navigate("/dashboard");
     } else {
       setMessage(res.message || "Error de autenticación");
     }
