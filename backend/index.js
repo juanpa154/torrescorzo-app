@@ -15,6 +15,11 @@ app.use('/api', protectedRoutes);
 const announcementRoutes = require('./src/routes/announcement.routes');
 app.use('/api/announcements', announcementRoutes);
 
+
+const userRoutes = require('./src/routes/user.routes');
+app.use('/api/users', userRoutes);
+
+
 app.get('/', (req, res) => {
   res.send('API funcionando 🚀');
 });
@@ -23,3 +28,4 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Servidor backend en http://localhost:${PORT}`);
 });
+

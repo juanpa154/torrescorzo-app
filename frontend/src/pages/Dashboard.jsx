@@ -38,14 +38,15 @@ export default function Dashboard() {
           Ver anuncios
         </button>
 
-        {user.role === "admin" && (
+          {user.role === "admin" && (
           <button
-            onClick={() => alert("Opción solo para admins")}
+            onClick={() => navigate("/admin")}
             className="block w-full p-2 bg-red-600 text-white rounded"
           >
             Panel de administración
           </button>
         )}
+
       </div>
     </div>
   );

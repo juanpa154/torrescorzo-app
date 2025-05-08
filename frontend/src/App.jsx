@@ -8,6 +8,8 @@ import NewAnnouncement from "./pages/NewAnnouncement";
 import Dashboard from "./pages/Dashboard";
 import RoleProtectedRoute from "./components/RoleProtectedRoute";
 import { getToken } from "./services/api";
+import AdminPanel from "./pages/AdminPanel";
+
 
 export default function App() {
   const [user, setUser] = useState(null);
@@ -32,6 +34,8 @@ export default function App() {
         {user && (user.role === "admin" || user.role === "editor") && (
           <Link to="/new">Nuevo Anuncio</Link>
         )}
+        {user?.role === "admin" && <Link to="/admin">Admin</Link>}
+
       </nav>
 
       <Routes>
@@ -69,6 +73,15 @@ export default function App() {
             </PrivateRoute>
           }
         />
+      <Route
+          path="/admin"
+          element={
+            <RoleProtectedRoute allowedRoles={["admin"]}>
+              <AdminPanel />
+            </RoleProtectedRoute>
+          }
+      />
+
       </Routes>
     </BrowserRouter>
   );

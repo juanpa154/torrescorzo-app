@@ -35,3 +35,24 @@ export const createAnnouncement = async (title, content) => {
   return await res.json();
 };
 
+export const fetchUsers = async () => {
+  const token = getToken();
+  const res = await fetch("http://localhost:3000/api/users", {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  return await res.json();
+};
+
+export const updateUserRole = async (id, role) => {
+  const token = getToken();
+  const res = await fetch(`http://localhost:3000/api/users/${id}/role`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`
+    },
+    body: JSON.stringify({ role })
+  });
+  return await res.json();
+};
+
