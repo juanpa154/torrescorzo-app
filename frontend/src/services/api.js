@@ -17,3 +17,21 @@ export const login = async (email, password) => {
   });
   return await res.json();
 };
+
+export const getToken = () => {
+  return localStorage.getItem("token");
+};
+
+export const createAnnouncement = async (title, content) => {
+  const token = getToken();
+  const res = await fetch("http://localhost:3000/api/announcements", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ title, content }),
+  });
+  return await res.json();
+};
+
