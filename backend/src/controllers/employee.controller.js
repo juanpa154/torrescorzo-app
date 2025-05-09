@@ -1,3 +1,7 @@
+const { PrismaClient } = require('@prisma/client');
+const prisma = new PrismaClient();
+
+
 const {
   getAllEmployees,
   createEmployee,
@@ -14,9 +18,16 @@ const create = async (req, res) => {
   const user = req.user;
   if (user.role === "viewer") return res.status(403).json({ message: "No autorizado" });
 
+  const existing = await prisma.employee.findUnique({
+    where: { email: req.body.email }
+  });
+
+  if (existing) return res.status(400).json({ message: "Ya existe un empleado con ese correo" });
+
   const employee = await createEmployee(req.body);
   res.status(201).json(employee);
 };
+
 
 const update = async (req, res) => {
   const user = req.user;
