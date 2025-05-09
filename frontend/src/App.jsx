@@ -13,6 +13,8 @@ import EmployeeDirectory from "./pages/EmployeeDirectory";
 import NewEmployee from "./pages/NewEmployee";
 import EditEmployee from "./pages/EditEmployee";
 import SettingsPanel from "./pages/SettingsPanel";
+import EmployeeStats from "./pages/EmployeeStats";
+
 
 
 
@@ -50,6 +52,11 @@ export default function App() {
         {user && (user.role === "admin" || user.role === "editor") && (
           <Link to="/settings">Configurar etiquetas</Link>
         )}
+
+        {user && (user.role === "admin" || user.role === "editor") && (
+          <Link to="/directory/stats">Estadísticas</Link>
+        )}
+
 
 
 
@@ -131,6 +138,15 @@ export default function App() {
           </RoleProtectedRoute>
         }
       />
+      <Route
+        path="/directory/stats"
+        element={
+           <RoleProtectedRoute allowedRoles={["admin", "editor"]}>
+            <EmployeeStats />
+          </RoleProtectedRoute>
+        }
+      />
+
 
 
 
