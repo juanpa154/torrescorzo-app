@@ -56,3 +56,12 @@ export const updateUserRole = async (id, role) => {
   return await res.json();
 };
 
+export const fetchEmployees = async () => {
+  const token = getToken();
+  const res = await fetch("http://localhost:3000/api/employees", {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  return await res.json();
+};
+
+

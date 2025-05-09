@@ -9,6 +9,8 @@ import Dashboard from "./pages/Dashboard";
 import RoleProtectedRoute from "./components/RoleProtectedRoute";
 import { getToken } from "./services/api";
 import AdminPanel from "./pages/AdminPanel";
+import EmployeeDirectory from "./pages/EmployeeDirectory";
+
 
 
 export default function App() {
@@ -35,6 +37,8 @@ export default function App() {
           <Link to="/new">Nuevo Anuncio</Link>
         )}
         {user?.role === "admin" && <Link to="/admin">Admin</Link>}
+        {user && <Link to="/directory">Directorio</Link>}
+
 
       </nav>
 
@@ -81,6 +85,15 @@ export default function App() {
             </RoleProtectedRoute>
           }
       />
+      <Route
+        path="/directory"
+        element={
+          <PrivateRoute>
+            <EmployeeDirectory />
+          </PrivateRoute>
+        }
+      />
+
 
       </Routes>
     </BrowserRouter>

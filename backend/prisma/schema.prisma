@@ -26,3 +26,15 @@ model Announcement {
   author    User     @relation(fields: [authorId], references: [id])
   authorId  Int
 }
+
+model Employee {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   @unique
+  phone     String?
+  position  String
+  location  String?
+  agency    String
+  createdAt DateTime @default(now())
+}
+

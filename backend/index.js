@@ -24,6 +24,10 @@ app.get('/', (req, res) => {
   res.send('API funcionando 🚀');
 });
 
+const employeeRoutes = require('./src/routes/employee.routes');
+app.use('/api/employees', employeeRoutes);
+
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Servidor backend en http://localhost:${PORT}`);
