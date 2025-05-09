@@ -77,4 +77,29 @@ export const createEmployee = async (employeeData) => {
   return await res.json();
 };
 
+export const updateEmployee = async (id, employeeData) => {
+  const token = getToken();
+  const res = await fetch(`http://localhost:3000/api/employees/${id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`
+    },
+    body: JSON.stringify(employeeData)
+  });
+  return await res.json();
+};
+
+export const deleteEmployee = async (id) => {
+  const token = getToken();
+  const res = await fetch(`http://localhost:3000/api/employees/${id}`, {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  });
+  return await res.json();
+};
+
+
 

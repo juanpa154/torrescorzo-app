@@ -11,6 +11,7 @@ import { getToken } from "./services/api";
 import AdminPanel from "./pages/AdminPanel";
 import EmployeeDirectory from "./pages/EmployeeDirectory";
 import NewEmployee from "./pages/NewEmployee";
+import EditEmployee from "./pages/EditEmployee";
 
 
 
@@ -107,6 +108,15 @@ export default function App() {
           </RoleProtectedRoute>
         }
       />
+      <Route
+        path="/directory/edit/:id"
+        element={
+          <RoleProtectedRoute allowedRoles={["admin"]}>
+            <EditEmployee />
+          </RoleProtectedRoute>
+        }
+      />
+
 
 
 

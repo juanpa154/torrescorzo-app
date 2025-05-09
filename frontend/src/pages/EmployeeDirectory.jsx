@@ -1,11 +1,20 @@
 import { useEffect, useState } from "react";
-import { fetchEmployees } from "../services/api";
+import { fetchEmployees, deleteEmployee } from "../services/api";
+import { useNavigate } from "react-router-dom";
 
 export default function EmployeeDirectory() {
   const [employees, setEmployees] = useState([]);
   const [search, setSearch] = useState("");
+  const [user, setUser] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      const decoded = JSON.parse(atob(token.split(".")[1]));
+      setUser(decoded);
+    }
+
     const load = async () => {
       const data = await fetchEmployees();
       setEmployees(data);
@@ -16,6 +25,14 @@ export default function EmployeeDirectory() {
   const filtered = employees.filter((emp) =>
     emp.name.toLowerCase().includes(search.toLowerCase())
   );
+
+  const handleDelete = async (id) => {
+    const confirmDelete = window.confirm("¿Eliminar este empleado?");
+    if (confirmDelete) {
+      await deleteEmployee(id);
+      setEmployees(employees.filter((e) => e.id !== id));
+    }
+  };
 
   return (
     <div className="p-6 max-w-5xl mx-auto">
@@ -38,8 +55,27 @@ export default function EmployeeDirectory() {
             {emp.location && (
               <p className="text-sm text-gray-400">📍 {emp.location}</p>
             )}
+            <p className="text-sm text-gray-400">🏢 {emp.agency}</p>
+
+            {user?.role === "admin" && (
+              <div className="flex justify-end gap-2 mt-4">
+                <button
+                  onClick={() => navigate(`/directory/edit/${emp.id}`)}
+                  className="text-sm px-2 py-1 bg-yellow-400 text-white rounded"
+                >
+                  Editar
+                </button>
+                <button
+                  onClick={() => handleDelete(emp.id)}
+                  className="text-sm px-2 py-1 bg-red-600 text-white rounded"
+                >
+                  Eliminar
+                </button>
+              </div>
+            )}
           </div>
         ))}
+
         {filtered.length === 0 && (
           <p className="text-gray-500 col-span-full text-center">Sin resultados.</p>
         )}
