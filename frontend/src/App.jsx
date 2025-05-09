@@ -12,6 +12,8 @@ import AdminPanel from "./pages/AdminPanel";
 import EmployeeDirectory from "./pages/EmployeeDirectory";
 import NewEmployee from "./pages/NewEmployee";
 import EditEmployee from "./pages/EditEmployee";
+import SettingsPanel from "./pages/SettingsPanel";
+
 
 
 
@@ -42,8 +44,13 @@ export default function App() {
         {user?.role === "admin" && <Link to="/admin">Admin</Link>}
         {user && <Link to="/directory">Directorio</Link>}
         {user && (user.role === "admin" || user.role === "editor") && (
-        <Link to="/directory/new">Agregar empleado</Link>
+          <Link to="/directory/new">Agregar empleado</Link>
          )}
+
+        {user && (user.role === "admin" || user.role === "editor") && (
+          <Link to="/settings">Configurar etiquetas</Link>
+        )}
+
 
 
 
@@ -113,6 +120,14 @@ export default function App() {
         element={
           <RoleProtectedRoute allowedRoles={["admin"]}>
             <EditEmployee />
+          </RoleProtectedRoute>
+        }
+      />
+      <Route
+        path="/settings"
+        element={
+          <RoleProtectedRoute allowedRoles={["admin", "editor"]}>
+            <SettingsPanel />
           </RoleProtectedRoute>
         }
       />

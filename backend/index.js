@@ -19,6 +19,10 @@ app.use('/api/announcements', announcementRoutes);
 const userRoutes = require('./src/routes/user.routes');
 app.use('/api/users', userRoutes);
 
+const settingsRoutes = require('./src/routes/settings.routes');
+app.use('/api/settings', settingsRoutes);
+
+
 
 app.get('/', (req, res) => {
   res.send('API funcionando 🚀');

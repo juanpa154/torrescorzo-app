@@ -101,5 +101,51 @@ export const deleteEmployee = async (id) => {
   return await res.json();
 };
 
+export const fetchSettings = async () => {
+  const token = getToken();
+  const res = await fetch("http://localhost:3000/api/settings", {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  return await res.json();
+};
+
+export const addAgency = async (name) => {
+  const token = getToken();
+  const res = await fetch("http://localhost:3000/api/settings/agency", {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+    body: JSON.stringify({ name })
+  });
+  return await res.json();
+};
+
+export const addLocation = async (name) => {
+  const token = getToken();
+  const res = await fetch("http://localhost:3000/api/settings/location", {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+    body: JSON.stringify({ name })
+  });
+  return await res.json();
+};
+
+export const deleteAgency = async (id) => {
+  const token = getToken();
+  const res = await fetch(`http://localhost:3000/api/settings/agency/${id}`, {
+    method: "DELETE",
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  return await res.json();
+};
+
+export const deleteLocation = async (id) => {
+  const token = getToken();
+  const res = await fetch(`http://localhost:3000/api/settings/location/${id}`, {
+    method: "DELETE",
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  return await res.json();
+};
+
 
 

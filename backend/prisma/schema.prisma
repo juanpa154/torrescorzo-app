@@ -38,3 +38,13 @@ model Employee {
   createdAt DateTime @default(now())
 }
 
+model Agency {
+  id    Int    @id @default(autoincrement())
+  name  String @unique
+}
+
+model Location {
+  id    Int    @id @default(autoincrement())
+  name  String @unique
+}
+

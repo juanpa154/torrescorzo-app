@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { updateEmployee, fetchEmployees } from "../services/api";
 import { useNavigate, useParams } from "react-router-dom";
-import { AGENCIES, LOCATIONS } from "../services/constants";
+import { fetchSettings } from "../services/api";
+
 
 
 export default function EditEmployee() {
@@ -9,13 +10,24 @@ export default function EditEmployee() {
   const navigate = useNavigate();
   const [form, setForm] = useState(null);
   const [message, setMessage] = useState("");
+  const [agencies, setAgencies] = useState([]);
+  const [locations, setLocations] = useState([]);
+  
+
 
   useEffect(() => {
-    fetchEmployees().then(data => {
-      const emp = data.find(e => e.id === parseInt(id));
-      if (emp) setForm(emp);
-    });
-  }, [id]);
+  const load = async () => {
+    const employees = await fetchEmployees();
+    const emp = employees.find(e => e.id === parseInt(id));
+    if (emp) setForm(emp);
+
+    const settings = await fetchSettings();
+    setAgencies(settings.agencies);
+    setLocations(settings.locations);
+  };
+
+  load();
+}, [id]);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -32,8 +44,9 @@ export default function EditEmployee() {
     }
   };
 
+  
   if (!form) return <p className="p-6">Cargando...</p>;
-
+  
   return (
     <div className="p-6 max-w-md mx-auto">
       <h2 className="text-xl font-bold mb-4">Editar Empleado</h2>
@@ -47,29 +60,36 @@ export default function EditEmployee() {
         <input name="position" placeholder="Puesto" className="w-full p-2 border"
           value={form.position} onChange={handleChange} required />
         <select
-        name="location"
-        value={form.location}
-        onChange={handleChange}
-        className="w-full p-2 border"
+          name="location"
+          value={form.location}
+          onChange={handleChange}
+          className="w-full p-2 border"
         >
-        <option value="">Selecciona ubicación</option>
-        {LOCATIONS.map((l) => (
-            <option key={l} value={l}>{l}</option>
-        ))}
+          <option value="">Selecciona ubicación</option>
+          {locations
+            .sort((a, b) => a.name.localeCompare(b.name))
+            .map((l) => (
+              <option key={l.id} value={l.name}>{l.name}</option>
+          ))}
+
+        </select>
+         
+        <select
+          name="agency"
+          value={form.agency}
+          onChange={handleChange}
+          required
+          className="w-full p-2 border"
+        >
+          <option value="">Selecciona agencia</option>
+          {agencies
+            .sort((a, b) => a.name.localeCompare(b.name))
+            .map((a) => (
+              <option key={a.id} value={a.name}>{a.name}</option>
+          ))}
+
         </select>
 
-        <select
-        name="agency"
-        value={form.agency}
-        onChange={handleChange}
-        required
-        className="w-full p-2 border"
-        >
-        <option value="">Selecciona agencia</option>
-        {AGENCIES.map((a) => (
-            <option key={a} value={a}>{a}</option>
-        ))}
-        </select>
 
         <button type="submit" className="bg-blue-600 text-white w-full p-2 rounded">
           Guardar cambios

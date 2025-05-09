@@ -1,7 +1,13 @@
 import { useState } from "react";
+import { useEffect } from "react"; 
 import { createEmployee } from "../services/api";
 import { useNavigate } from "react-router-dom";
-import { AGENCIES, LOCATIONS } from "../services/constants";
+import { fetchSettings } from "../services/api";
+
+
+
+
+
 
 export default function NewEmployee() {
   const [form, setForm] = useState({
@@ -14,9 +20,22 @@ export default function NewEmployee() {
   });
 
   const [message, setMessage] = useState("");
+  const [agencies, setAgencies] = useState([]);
+  const [locations, setLocations] = useState([]);
+
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  
+  useEffect(() => {
+      const loadSettings = async () => {
+        const res = await fetchSettings();
+        setAgencies(res.agencies);
+        setLocations(res.locations);
+      };
+      loadSettings();
+    }, []);
 
+  
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
@@ -88,11 +107,12 @@ export default function NewEmployee() {
           required
         >
           <option value="">Selecciona ubicación</option>
-          {LOCATIONS.map((l) => (
-            <option key={l} value={l}>
-              {l}
+          {locations.map((l) => (
+            <option key={l.id} value={l.name}>
+              {l.name}
             </option>
           ))}
+
         </select>
 
         <select
@@ -103,11 +123,12 @@ export default function NewEmployee() {
           required
         >
           <option value="">Selecciona agencia</option>
-          {AGENCIES.map((a) => (
-            <option key={a} value={a}>
-              {a}
+          {agencies.map((a) => (
+            <option key={a.id} value={a.name}>
+              {a.name}
             </option>
           ))}
+
         </select>
 
         <button
