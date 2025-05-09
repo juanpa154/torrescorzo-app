@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { createEmployee } from "../services/api";
 import { useNavigate } from "react-router-dom";
+import { AGENCIES, LOCATIONS } from "../services/constants";
 
 export default function NewEmployee() {
   const [form, setForm] = useState({
@@ -11,7 +12,9 @@ export default function NewEmployee() {
     location: "",
     agency: ""
   });
+
   const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -20,10 +23,20 @@ export default function NewEmployee() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
     const res = await createEmployee(form);
+    setLoading(false);
+
     if (res.id) {
       setMessage("Empleado creado ✅");
-      setForm({ name: "", email: "", phone: "", position: "", location: "" });
+      setForm({
+        name: "",
+        email: "",
+        phone: "",
+        position: "",
+        location: "",
+        agency: ""
+      });
       setTimeout(() => navigate("/directory"), 1000);
     } else {
       setMessage(res.message || "Error al crear empleado");
@@ -34,21 +47,75 @@ export default function NewEmployee() {
     <div className="p-6 max-w-md mx-auto">
       <h2 className="text-xl font-bold mb-4">Nuevo Empleado</h2>
       <form onSubmit={handleSubmit} className="space-y-4">
-        <input name="name" placeholder="Nombre" className="w-full p-2 border"
-          value={form.name} onChange={handleChange} required />
-        <input name="email" type="email" placeholder="Correo" className="w-full p-2 border"
-          value={form.email} onChange={handleChange} required />
-        <input name="phone" placeholder="Teléfono" className="w-full p-2 border"
-          value={form.phone} onChange={handleChange} />
-        <input name="position" placeholder="Puesto" className="w-full p-2 border"
-          value={form.position} onChange={handleChange} required />
-        <input name="location" placeholder="Ubicación" className="w-full p-2 border"
-          value={form.location} onChange={handleChange} />
-        <input name="agency" placeholder="Agencia" className="w-full p-2 border" 
-            value={form.agency} onChange={handleChange} required/>
+        <input
+          name="name"
+          placeholder="Nombre"
+          className="w-full p-2 border"
+          value={form.name}
+          onChange={handleChange}
+          required
+        />
+        <input
+          name="email"
+          type="email"
+          placeholder="Correo"
+          className="w-full p-2 border"
+          value={form.email}
+          onChange={handleChange}
+          required
+        />
+        <input
+          name="phone"
+          placeholder="Teléfono"
+          className="w-full p-2 border"
+          value={form.phone}
+          onChange={handleChange}
+        />
+        <input
+          name="position"
+          placeholder="Puesto"
+          className="w-full p-2 border"
+          value={form.position}
+          onChange={handleChange}
+          required
+        />
 
-        <button type="submit" className="bg-blue-600 text-white w-full p-2 rounded">
-          Crear empleado
+        <select
+          name="location"
+          value={form.location}
+          onChange={handleChange}
+          className="w-full p-2 border"
+          required
+        >
+          <option value="">Selecciona ubicación</option>
+          {LOCATIONS.map((l) => (
+            <option key={l} value={l}>
+              {l}
+            </option>
+          ))}
+        </select>
+
+        <select
+          name="agency"
+          value={form.agency}
+          onChange={handleChange}
+          className="w-full p-2 border"
+          required
+        >
+          <option value="">Selecciona agencia</option>
+          {AGENCIES.map((a) => (
+            <option key={a} value={a}>
+              {a}
+            </option>
+          ))}
+        </select>
+
+        <button
+          type="submit"
+          disabled={loading}
+          className="bg-blue-600 text-white w-full p-2 rounded disabled:opacity-50"
+        >
+          {loading ? "Guardando..." : "Crear empleado"}
         </button>
       </form>
       {message && <p className="text-center mt-4">{message}</p>}

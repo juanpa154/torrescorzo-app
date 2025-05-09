@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { updateEmployee, fetchEmployees } from "../services/api";
 import { useNavigate, useParams } from "react-router-dom";
+import { AGENCIES, LOCATIONS } from "../services/constants";
+
 
 export default function EditEmployee() {
   const { id } = useParams();
@@ -44,10 +46,31 @@ export default function EditEmployee() {
           value={form.phone} onChange={handleChange} />
         <input name="position" placeholder="Puesto" className="w-full p-2 border"
           value={form.position} onChange={handleChange} required />
-        <input name="location" placeholder="Ubicación" className="w-full p-2 border"
-          value={form.location} onChange={handleChange} />
-        <input name="agency" placeholder="Agencia" className="w-full p-2 border"
-          value={form.agency} onChange={handleChange} required />
+        <select
+        name="location"
+        value={form.location}
+        onChange={handleChange}
+        className="w-full p-2 border"
+        >
+        <option value="">Selecciona ubicación</option>
+        {LOCATIONS.map((l) => (
+            <option key={l} value={l}>{l}</option>
+        ))}
+        </select>
+
+        <select
+        name="agency"
+        value={form.agency}
+        onChange={handleChange}
+        required
+        className="w-full p-2 border"
+        >
+        <option value="">Selecciona agencia</option>
+        {AGENCIES.map((a) => (
+            <option key={a} value={a}>{a}</option>
+        ))}
+        </select>
+
         <button type="submit" className="bg-blue-600 text-white w-full p-2 rounded">
           Guardar cambios
         </button>
