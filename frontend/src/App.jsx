@@ -10,6 +10,8 @@ import RoleProtectedRoute from "./components/RoleProtectedRoute";
 import { getToken } from "./services/api";
 import AdminPanel from "./pages/AdminPanel";
 import EmployeeDirectory from "./pages/EmployeeDirectory";
+import NewEmployee from "./pages/NewEmployee";
+
 
 
 
@@ -38,6 +40,10 @@ export default function App() {
         )}
         {user?.role === "admin" && <Link to="/admin">Admin</Link>}
         {user && <Link to="/directory">Directorio</Link>}
+        {user && (user.role === "admin" || user.role === "editor") && (
+        <Link to="/directory/new">Agregar empleado</Link>
+         )}
+
 
 
       </nav>
@@ -93,6 +99,15 @@ export default function App() {
           </PrivateRoute>
         }
       />
+      <Route
+        path="/directory/new"
+        element={
+          <RoleProtectedRoute allowedRoles={["admin", "editor"]}>
+            <NewEmployee />
+          </RoleProtectedRoute>
+        }
+      />
+
 
 
       </Routes>

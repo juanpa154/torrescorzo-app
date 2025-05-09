@@ -64,4 +64,17 @@ export const fetchEmployees = async () => {
   return await res.json();
 };
 
+export const createEmployee = async (employeeData) => {
+  const token = getToken();
+  const res = await fetch("http://localhost:3000/api/employees", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(employeeData),
+  });
+  return await res.json();
+};
+
 
