@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { fetchEmployees, deleteEmployee } from "../services/api";
 import { useNavigate } from "react-router-dom";
+import { exportEmployeesToExcel } from "../utils/exportToExcel";
+
 
 export default function EmployeeDirectory() {
   const [employees, setEmployees] = useState([]);
@@ -37,6 +39,15 @@ export default function EmployeeDirectory() {
   return (
     <div className="p-6 max-w-5xl mx-auto">
       <h2 className="text-2xl font-bold mb-4">Directorio de Empleados</h2>
+      {user?.role !== "viewer" && (
+      <button
+        onClick={() => exportEmployeesToExcel(employees)}
+        className="mb-6 bg-green-600 text-white px-4 py-2 rounded"
+      >
+        Exportar a Excel
+      </button>
+      )}
+
       <input
         type="text"
         placeholder="Buscar por nombre"
