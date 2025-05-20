@@ -32,6 +32,8 @@ app.get('/', (req, res) => {
 const employeeRoutes = require('./src/routes/employee.routes');
 app.use('/api/employees', employeeRoutes);
 
+const vencimientosRoutes = require("./src/routes/vencimientos.routes");
+app.use("/api/vencimientos", vencimientosRoutes);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
