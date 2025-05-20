@@ -147,5 +147,19 @@ export const deleteLocation = async (id) => {
   return await res.json();
 };
 
+export const fetchVencimientos = async (filters) => {
+  const token = getToken();
+  const query = new URLSearchParams(filters).toString();
+
+  const res = await fetch(`http://localhost:3000/api/vencimientos?${query}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  return await res.json();
+};
+
+
 
 
