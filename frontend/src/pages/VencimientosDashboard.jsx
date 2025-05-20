@@ -55,11 +55,12 @@ export default function VencimientosDashboard() {
   };
 
   const importRanges = [
-    { label: "0 - 1,000", min: 0, max: 1000 },
-    { label: "1,000 - 5,000", min: 1000, max: 5000 },
-    { label: "5,000 - 10,000", min: 5000, max: 10000 },
-    { label: "+10,000", min: 10000, max: Infinity },
-  ];
+  { label: "0 - 300,000", min: 0, max: 300000 },
+  { label: "300,001 - 400,000", min: 300001, max: 400000 },
+  { label: "400,001 - 500,000", min: 400001, max: 500000 },
+  { label: "500,001+", min: 500001, max: Infinity },
+];
+
 
   const byCuenta = toChartData(groupBy("cuent"));
   const byMes = toChartData(groupByMonth()).sort((a, b) => new Date(a.name) - new Date(b.name));
@@ -136,7 +137,14 @@ export default function VencimientosDashboard() {
                 tickFormatter={(v) => `$${v.toLocaleString()}`}
                 width={100}
             />
-            <Tooltip />
+            <Tooltip
+            formatter={(value) =>
+                `$${parseFloat(value).toLocaleString("es-MX", {
+                minimumFractionDigits: 2,
+                })}`
+            }
+            />
+
             <Bar dataKey="value" fill="#60a5fa" />
           </BarChart>
         </ResponsiveContainer>
@@ -160,7 +168,14 @@ export default function VencimientosDashboard() {
                 width={100}
             />
 
-            <Tooltip />
+            <Tooltip
+            formatter={(value) =>
+                `$${parseFloat(value).toLocaleString("es-MX", {
+                minimumFractionDigits: 2,
+                })}`
+            }
+            />
+
             <Line type="monotone" dataKey="value" stroke="#34d399" />
           </LineChart>
         </ResponsiveContainer>
