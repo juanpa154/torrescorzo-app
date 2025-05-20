@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import { fetchVencimientos } from "../services/api";
+import { exportVencimientosToExcel } from "../utils/exportVencimientosExcelJS";
+
 
 export default function Vencimientos() {
   const [data, setData] = useState([]);
@@ -20,10 +22,14 @@ export default function Vencimientos() {
   useEffect(() => {
     handleSearch();
   }, []);
+  
+
 
   return (
     <div className="p-6 max-w-5xl mx-auto">
       <h2 className="text-2xl font-bold mb-4">Consulta de Vencimientos</h2>
+
+      
 
       <div className="flex flex-wrap gap-4 mb-6">
         <input
@@ -51,6 +57,14 @@ export default function Vencimientos() {
         >
           Buscar
         </button>
+        {data.length > 0 && (
+        <button
+            onClick={() => exportVencimientosToExcel(data)}
+            className="mb-4 bg-green-600 text-white px-4 py-2 rounded"
+        >
+            Exportar a Excel
+        </button>
+        )}
       </div>
 
       <table className="w-full border text-sm">
