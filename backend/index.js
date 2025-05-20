@@ -22,7 +22,8 @@ app.use('/api/users', userRoutes);
 const settingsRoutes = require('./src/routes/settings.routes');
 app.use('/api/settings', settingsRoutes);
 
-
+const ordenesRoutes = require('./src/routes/ordenes.routes');
+app.use('/api/ordenes', ordenesRoutes);
 
 app.get('/', (req, res) => {
   res.send('API funcionando 🚀');
