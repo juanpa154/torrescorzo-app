@@ -14,8 +14,8 @@ import NewEmployee from "./pages/NewEmployee";
 import EditEmployee from "./pages/EditEmployee";
 import SettingsPanel from "./pages/SettingsPanel";
 import EmployeeStats from "./pages/EmployeeStats";
-import Vencimientos from "./pages/Vencimientos";
-import VencimientosDashboard from "./pages/VencimientosDashboard";
+//import Vencimientos from "./pages/Vencimientos";
+//import VencimientosDashboard from "./pages/VencimientosDashboard";
 
 
 
@@ -61,14 +61,8 @@ export default function App() {
           <Link to="/directory/stats">Estadísticas</Link>
         )}
 
-
-        {user && (user.role === "admin" || user.role === "editor") && (
-          <Link to="/vencimientos">Vencimientos</Link>
-        )}
-
-        {user && (user.role === "admin" || user.role === "editor") && (
-          <Link to="/vencimientos/dashboard">Dashboard Vencimientos</Link>
-        )}
+        
+        
 
         
 
@@ -162,22 +156,7 @@ export default function App() {
           </RoleProtectedRoute>
         }
       />
-      <Route
-        path="/vencimientos"
-        element={
-          <RoleProtectedRoute allowedRoles={["admin", "editor"]}>
-            <Vencimientos />
-          </RoleProtectedRoute>
-        }
-      />
-      <Route
-        path="/vencimientos/dashboard"
-        element={
-          <RoleProtectedRoute allowedRoles={["admin", "editor"]}>
-            <VencimientosDashboard />
-          </RoleProtectedRoute>
-        }
-      />
+      
 
 
       
