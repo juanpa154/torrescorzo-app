@@ -25,6 +25,11 @@ app.use('/api/settings', settingsRoutes);
 const ordenesRoutes = require('./src/routes/ordenes.routes');
 app.use('/api/ordenes', ordenesRoutes);
 
+const cfdiRoutes = require('./src/routes/cfdi.routes');
+app.use('/api/cfdi', cfdiRoutes);
+
+
+
 app.get('/', (req, res) => {
   res.send('API funcionando 🚀');
 });
