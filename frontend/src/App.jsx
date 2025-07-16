@@ -14,6 +14,8 @@ import NewEmployee from "./pages/NewEmployee";
 import EditEmployee from "./pages/EditEmployee";
 import SettingsPanel from "./pages/SettingsPanel";
 import EmployeeStats from "./pages/EmployeeStats";
+import CfdiViewer from "./pages/CfdiViewer";
+
 //import Vencimientos from "./pages/Vencimientos";
 //import VencimientosDashboard from "./pages/VencimientosDashboard";
 
@@ -60,6 +62,11 @@ export default function App() {
         {user && (user.role === "admin" || user.role === "editor") && (
           <Link to="/directory/stats">Estadísticas</Link>
         )}
+
+        {user && (user.role === "admin" || user.role === "editor") && (
+          <Link to="/cfdi">CFDI</Link>
+        )}
+
 
         
         
@@ -156,6 +163,15 @@ export default function App() {
           </RoleProtectedRoute>
         }
       />
+      <Route
+        path="/cfdi"
+        element={
+          <RoleProtectedRoute allowedRoles={["admin", "editor"]}>
+            <CfdiViewer />
+          </RoleProtectedRoute>
+        }
+      />
+
       
 
 
