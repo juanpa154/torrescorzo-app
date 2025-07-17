@@ -2,6 +2,46 @@
   padding: 1rem;
 }
 
+.cfdi-container::-webkit-scrollbar {
+  height: 8px;
+  width: 8px;
+}
+.cfdi-container::-webkit-scrollbar-thumb {
+  background-color: #cbd5e0; /* Tailwind gray-400 */
+  border-radius: 4px;
+}
+.cfdi-container::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+
+
+.cfdi-summary-bar {
+  
+  z-index: 30;
+  background-color: #f9fafb; /* Gris clarito */
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid #e5e7eb;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  overflow-x: auto; /* para scroll horizontal */
+}
+
+
+
+
+/* Distribución responsive de los totales */
+.cfdi-summary-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  font-size: 0.95rem;
+}
+
+
+
+
 .cfdi-select {
   margin-bottom: 1rem;
   padding: 0.4rem;
@@ -33,7 +73,7 @@
 .cfdi-table thead th {
   position: sticky;
   top: 0;
-  background-color: #f7f7f7;
+  background-color: black;
   padding: 8px;
   border: 1px solid #ccc;
   z-index: 1;

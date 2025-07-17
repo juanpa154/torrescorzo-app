@@ -5,69 +5,153 @@ import './CfdiViewer.css';
 export default function CfdiViewer() {
   const [cfdis, setCfdis] = useState([]);
   const [schema, setSchema] = useState('kia_zacatecas');
+  const [mes, setMes] = useState('');
+  const [anio, setAnio] = useState('');
+  const [resumen, setResumen] = useState(null);
   const [total, setTotal] = useState(0);
   const [error, setError] = useState(null);
+  const [page, setPage] = useState(1);
+  const limit = 50;
 
-  useEffect(() => {
-    const fetchCfdis = async () => {
-      try {
-        const res = await axios.get(`/api/cfdi/${schema}/ingresos?page=1&limit=50`);
-        setCfdis(res.data.data);
-        setTotal(res.data.total);
-        setError(null);
-      } catch (err) {
-        setError('Error al obtener los datos.');
-        setCfdis([]);
-        setTotal(0);
-      }
-    };
+  const fetchCfdis = async () => {
+    try {
+      const params = new URLSearchParams();
+      if (mes) params.append('mes', mes);
+      if (anio) params.append('anio', anio);
+      params.append('page', page);
+      params.append('limit', limit);
 
-    fetchCfdis();
-  }, [schema]);
-
-  const handleSchemaChange = (e) => {
-    setSchema(e.target.value);
+      const res = await axios.get(`/api/cfdi/${schema}/ingresos?${params.toString()}`);
+      setCfdis(res.data.data);
+      setTotal(res.data.total);
+      setResumen(res.data.resumen);
+      setError(null);
+    } catch (err) {
+      console.error('Error al obtener CFDIs:', err);
+      setError('Error al obtener los datos.');
+      setCfdis([]);
+      setResumen(null);
+      setTotal(0);
+    }
   };
 
+  useEffect(() => {
+    fetchCfdis();
+  }, [schema, mes, anio, page]);
+
+  const totalPages = Math.ceil(total / limit);
+
   return (
-    <div className="cfdi-container">
-      <h2>CFDI Emitidos</h2>
+    <div className="cfdi-container p-4">
+      <h2 className="text-2xl font-bold mb-4">CFDI Emitidos</h2>
 
-      <select value={schema} onChange={handleSchemaChange} className="cfdi-select">
-        <option value="kia_zacatecas">KIA Zacatecas</option>
-        <option value="kia_celaya">KIA Celaya</option>
-        {/* Agrega más opciones si hay más esquemas */}
-      </select>
+      <div className="flex flex-wrap gap-4 mb-4">
+        <select value={schema} onChange={(e) => setSchema(e.target.value)} className="border px-2 py-1 rounded">
+          <option value="kia_zacatecas">KIA Zacatecas</option>
+          <option value="kia_celaya">KIA Celaya</option>
+          <option value="kia_lomas">KIA Lomas</option>
+        </select>
 
-      {error && <div className="error">{error}</div>}
+        <select value={mes} onChange={(e) => { setMes(e.target.value); setPage(1); }} className="border px-2 py-1 rounded">
+          <option value="">-- Mes --</option>
+          {[...Array(12)].map((_, i) => (
+            <option key={i} value={i + 1}>{i + 1}</option>
+          ))}
+        </select>
+
+        <select
+          value={anio}
+          onChange={(e) => { setAnio(e.target.value); setPage(1); }}
+          className="border px-2 py-1 rounded w-28"
+        >
+          <option value="">-- Año --</option>
+          {[...Array(11)].map((_, i) => {
+            const year = 2020 + i;
+            return (
+              <option key={year} value={year}>
+                {year}
+              </option>
+            );
+          })}
+        </select>
+      </div>
+
+      
+
+
+      {error && <div className="text-red-500 mb-4">{error}</div>}
 
       {!error && (
         <>
-          <div className="cfdi-summary">
-            Total de registros: {total}
-          </div>
+          <div className="text-sm text-gray-600 mb-2">Total de registros: {total}</div>
 
-          <div className="cfdi-table-container">
-            <table className="cfdi-table">
+            {resumen && (
+              <div className="cfdi-summary-bar">
+                <div className="cfdi-summary-grid">
+                  <div><span className="font-semibold">Subtotal:</span> ${parseFloat(resumen.subtotal).toLocaleString()}</div>
+                  <div><span className="font-semibold">IVA 16%:</span> ${parseFloat(resumen.iva16).toLocaleString()}</div>
+                  <div><span className="font-semibold">Retenciones:</span> ${parseFloat(resumen.retenidos).toLocaleString()}</div>
+                  <div><span className="font-semibold">Total:</span> ${parseFloat(resumen.total).toLocaleString()}</div>
+                </div>
+              </div>
+            )}
+
+          <div className="cfdi-table-wrapper border rounded">
+            
+            <table className="cfdi-table min-w-full text-xs text-gray-800 border-collapse">
+
+            
+
+
               <thead>
                 <tr>
                   {cfdis.length > 0 &&
                     Object.keys(cfdis[0]).map((key) => (
-                      <th key={key}>{key}</th>
+                     <th
+                        key={key}
+                        className="px-3 py-2 border border-gray-700 font-semibold text-left whitespace-nowrap sticky top-[96px] bg-gray-800 text-white z-10"
+                      >
+                        {key.replaceAll('_', ' ')}
+                      </th>
                     ))}
                 </tr>
               </thead>
+
+              
               <tbody>
                 {cfdis.map((item, index) => (
-                  <tr key={index}>
+                  <tr key={index} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50 hover:bg-gray-100'}>
                     {Object.values(item).map((val, i) => (
-                      <td key={i}>{val !== null ? val.toString() : ''}</td>
+                      <td
+                        key={i}
+                        className="px-3 py-2 border border-gray-200 whitespace-nowrap truncate max-w-[200px] text-gray-700 text-xs"
+                      >
+                        {val !== null ? val.toString() : ''}
+                      </td>
                     ))}
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
+
+          {totalPages > 1 && (
+            <div className="mt-4 flex flex-wrap justify-center items-center gap-2">
+              {Array.from({ length: totalPages }, (_, i) => (
+                <button
+                  key={i}
+                  className={`px-3 py-1 rounded border text-sm font-medium ${
+                    page === i + 1
+                      ? 'bg-blue-600 text-white border-blue-600'
+                      : 'bg-white text-gray-700 border-gray-300 hover:bg-blue-50'
+                  }`}
+                  onClick={() => setPage(i + 1)}
+                >
+                  {i + 1}
+                </button>
+              ))}
+            </div>
+          )}
         </>
       )}
     </div>
