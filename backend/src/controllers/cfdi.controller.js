@@ -1,49 +1,67 @@
 const getCfdiClient = require('../db/cfdiClient');
 
-async function getCfdiIngresos(schema, page = 1, limit = 50, filters = {}) {
+async function getCfdiIngresos(schema, page = 1, limit = 50, filtros = {}) {
   const client = getCfdiClient(schema);
   const offset = (page - 1) * limit;
-  const { mes, anio } = filters;
 
   try {
     await client.connect();
 
-    // ----------- Construcción dinámica de filtros -----------
-    const conditions = [];
-    const filterValues = [];
+    const condiciones = [];
+    const valores = [];
+    let i = 1;
 
-    if (mes) {
-      conditions.push(`EXTRACT(MONTH FROM fecha_emision) = $${filterValues.length + 1}`);
-      filterValues.push(mes);
+    // Filtros dinámicos
+    if (filtros.mes) {
+      condiciones.push(`EXTRACT(MONTH FROM fecha_emision) = $${i++}`);
+      valores.push(filtros.mes);
     }
 
-    if (anio) {
-      conditions.push(`EXTRACT(YEAR FROM fecha_emision) = $${filterValues.length + 1}`);
-      filterValues.push(anio);
+    if (filtros.anio) {
+      condiciones.push(`EXTRACT(YEAR FROM fecha_emision) = $${i++}`);
+      valores.push(filtros.anio);
     }
 
-    const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
+    if (filtros.tipo) {
+      condiciones.push(`tipo = $${i++}`);
+      valores.push(filtros.tipo);
+    }
 
-    // ----------- Query de datos paginados -----------
-    const paginatedQuery = `
+  
+    if (filtros.rfc) {
+      condiciones.push(`rfc_receptor ILIKE $${i++}`);
+      valores.push(`%${filtros.rfc}%`);
+    }
+
+
+    if (filtros.minMonto) {
+  condiciones.push(`total >= $${i++}`);
+  valores.push(filtros.minMonto);
+  }
+
+    if (filtros.maxMonto) {
+      condiciones.push(`total <= $${i++}`);
+      valores.push(filtros.maxMonto);
+    }
+
+    const whereClause = condiciones.length > 0 ? `WHERE ${condiciones.join(' AND ')}` : '';
+
+    // Consulta paginada
+    const query = `
       SELECT * FROM ing_eg_emi
       ${whereClause}
       ORDER BY fecha_emision DESC
-      LIMIT $${filterValues.length + 1}
-      OFFSET $${filterValues.length + 2}
+      LIMIT $${i++}
+      OFFSET $${i++}
     `;
+    const paginatedValues = [...valores, limit, offset];
+    const result = await client.query(query, paginatedValues);
 
-    const paginatedValues = [...filterValues, limit, offset];
-    const result = await client.query(paginatedQuery, paginatedValues);
+    // Conteo total
+    const countQuery = `SELECT COUNT(*) FROM ing_eg_emi ${whereClause}`;
+    const countResult = await client.query(countQuery, valores);
 
-    // ----------- Query de conteo -----------
-    const countQuery = `
-      SELECT COUNT(*) FROM ing_eg_emi
-      ${whereClause}
-    `;
-    const countResult = await client.query(countQuery, filterValues);
-
-    // ----------- Query de resumen -----------
+    // Resumen
     const resumenQuery = `
       SELECT 
         COALESCE(SUM(subtotal), 0) AS subtotal,
@@ -53,7 +71,7 @@ async function getCfdiIngresos(schema, page = 1, limit = 50, filters = {}) {
       FROM ing_eg_emi
       ${whereClause}
     `;
-    const resumenResult = await client.query(resumenQuery, filterValues);
+    const resumenResult = await client.query(resumenQuery, valores);
 
     return {
       data: result.rows,
@@ -70,7 +88,6 @@ async function getCfdiIngresos(schema, page = 1, limit = 50, filters = {}) {
     await client.end();
   }
 }
-
 
 module.exports = {
   getCfdiIngresos

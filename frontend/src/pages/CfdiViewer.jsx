@@ -12,14 +12,24 @@ export default function CfdiViewer() {
   const [error, setError] = useState(null);
   const [page, setPage] = useState(1);
   const limit = 50;
+  const [rfc, setRfc] = useState('');
+  const [tipo, setTipo] = useState('');
+  const [minMonto, setMinMonto] = useState('');
+  const [maxMonto, setMaxMonto] = useState('');
+
 
   const fetchCfdis = async () => {
     try {
       const params = new URLSearchParams();
       if (mes) params.append('mes', mes);
       if (anio) params.append('anio', anio);
+      if (rfc) params.append('rfc', rfc);
+      if (tipo) params.append('tipo', tipo);
+      if (minMonto) params.append('minMonto', minMonto);
+      if (maxMonto) params.append('maxMonto', maxMonto);
       params.append('page', page);
       params.append('limit', limit);
+
 
       const res = await axios.get(`/api/cfdi/${schema}/ingresos?${params.toString()}`);
       setCfdis(res.data.data);
@@ -37,7 +47,7 @@ export default function CfdiViewer() {
 
   useEffect(() => {
     fetchCfdis();
-  }, [schema, mes, anio, page]);
+  }, [schema, mes, anio, page, tipo, rfc, minMonto, maxMonto]);
 
   const totalPages = Math.ceil(total / limit);
 
@@ -74,6 +84,44 @@ export default function CfdiViewer() {
             );
           })}
         </select>
+      <input
+            type="text"
+            placeholder="RFC Receptor"
+            value={rfc}
+            onChange={(e) => { setRfc(e.target.value); setPage(1); }}
+            className="border px-2 py-1 rounded w-52"
+          />
+
+          <select
+            value={tipo}
+            onChange={(e) => { setTipo(e.target.value); setPage(1); }}
+            className="border px-2 py-1 rounded w-48"
+          >
+            <option value="">-- Tipo CFDI --</option>
+            <option value="I">Ingreso (I)</option>
+            <option value="NotaCredito">Nota crédito (E)</option>
+            <option value="T">Traslado (T)</option>
+            <option value="P">Pago (P)</option>
+            <option value="N">Nómina (N)</option>
+          </select>
+
+
+          <input
+            type="number"
+            placeholder="Monto mínimo"
+            value={minMonto}
+            onChange={(e) => { setMinMonto(e.target.value); setPage(1); }}
+            className="border px-2 py-1 rounded w-36"
+          />
+
+          <input
+            type="number"
+            placeholder="Monto máximo"
+            value={maxMonto}
+            onChange={(e) => { setMaxMonto(e.target.value); setPage(1); }}
+            className="border px-2 py-1 rounded w-36"
+          />
+
       </div>
 
       
@@ -83,7 +131,7 @@ export default function CfdiViewer() {
 
       {!error && (
         <>
-          <div className="text-sm text-gray-600 mb-2">Total de registros: {total}</div>
+          <div className="text-sm text-gray-600 mb-2 ">Total de registros: {total}</div>
 
             {resumen && (
               <div className="cfdi-summary-bar">

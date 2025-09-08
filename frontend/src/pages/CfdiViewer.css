@@ -25,7 +25,8 @@
   height: 56px;
   display: flex;
   align-items: center;
-  overflow-x: auto; /* para scroll horizontal */
+  overflow-x: auto; 
+  /* para scroll horizontal */
 }
 
 
