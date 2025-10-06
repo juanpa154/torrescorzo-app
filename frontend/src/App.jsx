@@ -15,6 +15,7 @@ import EditEmployee from "./pages/EditEmployee";
 import SettingsPanel from "./pages/SettingsPanel";
 import EmployeeStats from "./pages/EmployeeStats";
 import CfdiViewer from "./pages/CfdiViewer";
+import CfdiRecibidos from "./pages/CfdiRecibidos";
 
 //import Vencimientos from "./pages/Vencimientos";
 //import VencimientosDashboard from "./pages/VencimientosDashboard";
@@ -64,19 +65,12 @@ export default function App() {
         )}
 
         {user && (user.role === "admin" || user.role === "editor") && (
-          <Link to="/cfdi">CFDI</Link>
+          <Link to="/cfdi/emitidos">CFDI Emitidos</Link>
         )}
 
-
-        
-        
-
-        
-
-
-
-
-
+        {user && (user.role === "admin" || user.role === "editor") && (
+          <Link to="/cfdi/recibidos">CFDI Recibidos</Link>
+        )}
 
       </nav>
 
@@ -164,7 +158,7 @@ export default function App() {
         }
       />
       <Route
-        path="/cfdi"
+        path="/cfdi/emitidos"
         element={
           <RoleProtectedRoute allowedRoles={["admin", "editor"]}>
             <CfdiViewer />
@@ -172,13 +166,14 @@ export default function App() {
         }
       />
 
-      
-
-
-      
-
-
-
+      <Route
+        path="/cfdi/recibidos"
+        element={
+          <RoleProtectedRoute allowedRoles={["admin", "editor"]}>
+            <CfdiRecibidos />
+          </RoleProtectedRoute>
+        }
+      />
 
 
       </Routes>
