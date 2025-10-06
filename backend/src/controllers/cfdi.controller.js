@@ -93,7 +93,7 @@ async function getCfdiIngresos(schema, page = 1, limit = 50, filtros = {}) {
 // =====================================
 // FUNCIÓN PARA CFDI RECIBIDOS
 // =====================================
-async function getCfdiRecibidos(schema, page = 1, limit = 50, filtros = {}) {
+async function getCfdiRecibidos(schema, page = 1, limit = 50, filtros = {}) {4
   const client = getCfdiClient(schema);
   const offset = (page - 1) * limit;
 
