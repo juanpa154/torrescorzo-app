@@ -64,6 +64,7 @@ export default function CfdiViewer({
           <option value="kia_zacatecas">KIA Zacatecas</option>
           <option value="kia_celaya">KIA Celaya</option>
           <option value="kia_lomas">KIA Lomas</option>
+          <option value="kia_irapuato">KIA Irapuato</option>
         </select>
 
         <select value={mes} onChange={(e) => { setMes(e.target.value); setPage(1); }} className="border px-2 py-1 rounded">
@@ -165,7 +166,7 @@ export default function CfdiViewer({
                     {Object.values(item).map((val, i) => (
                       <td
                         key={i}
-                        className="px-3 py-2 border border-gray-200 whitespace-nowrap truncate max-w-[200px] text-gray-700 text-xs"
+                        className="px-3 py-2 border border-gray-200 whitespace-nowrap  text-gray-700 text-xs"
                       >
                         {val !== null ? val.toString() : ''}
                       </td>
