@@ -1,0 +1,22 @@
+.settings-tag-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 0.75rem;
+  background: var(--p-surface-2);
+  border: 1px solid var(--p-border);
+  border-radius: 7px;
+  gap: 0.5rem;
+}
+
+.settings-tag-name {
+  font-size: 0.875rem;
+  color: var(--p-text);
+  font-weight: 500;
+}
+
+@media (max-width: 640px) {
+  .settings-grid {
+    grid-template-columns: 1fr !important;
+  }
+}

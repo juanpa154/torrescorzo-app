@@ -1,0 +1,36 @@
+.stats-charts-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+}
+
+.stats-tooltip {
+  background: #fff;
+  border: 1px solid var(--p-border);
+  border-radius: 8px;
+  padding: 0.5rem 0.875rem;
+  box-shadow: var(--p-shadow-md);
+}
+
+.stats-tooltip__label {
+  font-size: 0.8rem;
+  color: var(--p-text-2);
+  margin: 0 0 0.2rem;
+  font-weight: 600;
+}
+
+.stats-tooltip__value {
+  font-size: 0.9rem;
+  color: var(--p-text);
+  font-weight: 700;
+  margin: 0;
+}
+
+@media (max-width: 768px) {
+  .stats-charts-grid {
+    grid-template-columns: 1fr;
+  }
+  .stats-charts-grid .card[style*="grid-column"] {
+    grid-column: auto !important;
+  }
+}

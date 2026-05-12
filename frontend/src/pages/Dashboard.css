@@ -1,0 +1,118 @@
+/* Dashboard-specific styles */
+
+.dash-welcome {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: #fff;
+  border: 1px solid var(--p-border);
+  border-radius: var(--p-radius);
+  padding: 1.25rem 1.5rem;
+  box-shadow: var(--p-shadow);
+}
+
+.dash-welcome__avatar {
+  width: 48px;
+  height: 48px;
+  background: linear-gradient(135deg, #dc2626, #991b1b);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.dash-welcome__title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--p-text);
+  margin: 0 0 0.1rem;
+}
+
+.dash-welcome__email {
+  font-size: 0.85rem;
+  color: var(--p-text-2);
+  margin: 0;
+}
+
+.dash-welcome__badge {
+  margin-left: auto;
+}
+
+/* Quick access grid */
+.dash-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.dash-card {
+  background: #fff;
+  border: 1px solid var(--p-border);
+  border-radius: var(--p-radius);
+  padding: 1.25rem;
+  text-align: left;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s;
+  position: relative;
+  overflow: hidden;
+  font-family: inherit;
+}
+
+.dash-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--p-shadow-md);
+  border-color: var(--card-accent, var(--p-red));
+}
+
+.dash-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--card-accent, #dc2626);
+  border-radius: var(--p-radius) var(--p-radius) 0 0;
+}
+
+.dash-card__dot {
+  width: 10px;
+  height: 10px;
+  background: var(--card-accent, #dc2626);
+  border-radius: 50%;
+  margin-bottom: 0.875rem;
+  opacity: 0.8;
+}
+
+.dash-card__label {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--p-text);
+  margin: 0 0 0.25rem;
+}
+
+.dash-card__desc {
+  font-size: 0.8rem;
+  color: var(--p-text-3);
+  margin: 0;
+}
+
+/* Admin actions */
+.dash-admin-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+@media (max-width: 600px) {
+  .dash-welcome {
+    flex-wrap: wrap;
+  }
+  .dash-welcome__badge {
+    margin-left: 0;
+  }
+}

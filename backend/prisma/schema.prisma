@@ -50,3 +50,63 @@ model Location {
   name  String @unique
 }
 
+model CfdiEmitido {
+  id             Int       @id @default(autoincrement())
+  uuid           String
+  schema         String
+  fechaEmision   DateTime?
+  tipo           String?
+  rfcReceptor    String?
+  rfcEmisor      String?
+  subtotal       Decimal?  @db.Decimal(18, 2)
+  iva16          Decimal?  @db.Decimal(18, 2)
+  totalRetenidos Decimal?  @db.Decimal(18, 2)
+  total          Decimal?  @db.Decimal(18, 2)
+  conceptos      String?
+  categoriaIa    String?
+  datos          Json
+  sincronizadoAt DateTime  @default(now())
+
+  @@unique([uuid, schema])
+  @@index([schema, fechaEmision])
+  @@index([schema, tipo])
+  @@index([schema, categoriaIa])
+  @@map("cfdi_emitidos")
+}
+
+model CfdiRecibido {
+  id             Int       @id @default(autoincrement())
+  uuid           String
+  schema         String
+  fechaEmision   DateTime?
+  tipo           String?
+  rfcEmisor      String?
+  rfcReceptor    String?
+  subtotal       Decimal?  @db.Decimal(18, 2)
+  iva16          Decimal?  @db.Decimal(18, 2)
+  totalRetenidos Decimal?  @db.Decimal(18, 2)
+  total          Decimal?  @db.Decimal(18, 2)
+  conceptos      String?
+  categoriaIa    String?
+  datos          Json
+  sincronizadoAt DateTime  @default(now())
+
+  @@unique([uuid, schema])
+  @@index([schema, fechaEmision])
+  @@index([schema, tipo])
+  @@index([schema, categoriaIa])
+  @@map("cfdi_recibidos")
+}
+
+model SyncEstado {
+  id                 Int       @id @default(autoincrement())
+  schema             String
+  tipoCfdi           String
+  ultimaSync         DateTime?
+  totalSincronizados Int       @default(0)
+  enProgreso         Boolean   @default(false)
+
+  @@unique([schema, tipoCfdi])
+  @@map("sync_estados")
+}
+

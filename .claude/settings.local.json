@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mkdir \"e:\\\\ProyectosKia\\\\torrescorzo-app\\\\torrescorzo-app\\\\backend\\\\src\\\\services\" 2>/dev/null; echo \"done\")",
+      "Bash(Get-ChildItem -Path \"e:\\\\ProyectosKia\\\\torrescorzo-app\\\\torrescorzo-app\\\\frontend\\\\src\\\\\" -Force)"
+    ],
+    "additionalDirectories": [
+      "e:\\ProyectosKia\\torrescorzo-app\\torrescorzo-app\\backend\\src"
+    ]
+  }
+}

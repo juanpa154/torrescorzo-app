@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
@@ -16,66 +16,26 @@ import SettingsPanel from "./pages/SettingsPanel";
 import EmployeeStats from "./pages/EmployeeStats";
 import CfdiViewer from "./pages/CfdiViewer";
 import CfdiRecibidos from "./pages/CfdiRecibidos";
+import CfdiDashboard from "./pages/CfdiDashboard";
+import Navbar from "./components/Navbar";
 
-//import Vencimientos from "./pages/Vencimientos";
-//import VencimientosDashboard from "./pages/VencimientosDashboard";
+function AppLayout({ user, setUser }) {
+  const location = useLocation();
+  const isLoginPage = location.pathname === "/";
 
-
-
-
-
-
-
-
-export default function App() {
-  const [user, setUser] = useState(null);
-
-  useEffect(() => {
-    const token = getToken();
-    if (token) {
-      const decoded = JSON.parse(atob(token.split(".")[1]));
-      setUser(decoded);
-    }
-  }, []);
+  function handleLogout() {
+    localStorage.removeItem("token");
+    setUser(null);
+  }
 
   return (
-    <BrowserRouter>
-      <nav className="p-4 bg-gray-100 flex gap-4">
-        {!user && <Link to="/">Login</Link>}
-        {user?.role === "admin" && <Link to="/register">Registro</Link>}
-
-        {user && <Link to="/dashboard">Dashboard</Link>}
-        {user && <Link to="/announcements">Anuncios</Link>}
-
-        {user && (user.role === "admin" || user.role === "editor") && (
-          <Link to="/new">Nuevo Anuncio</Link>
-        )}
-        {user?.role === "admin" && <Link to="/admin">Admin</Link>}
-        {user && <Link to="/directory">Directorio</Link>}
-        {user && (user.role === "admin" || user.role === "editor") && (
-          <Link to="/directory/new">Agregar empleado</Link>
-         )}
-
-        {user && (user.role === "admin" || user.role === "editor") && (
-          <Link to="/settings">Configurar etiquetas</Link>
-        )}
-
-        {user && (user.role === "admin" || user.role === "editor") && (
-          <Link to="/directory/stats">Estadísticas</Link>
-        )}
-
-        {user && (user.role === "admin" || user.role === "editor") && (
-          <Link to="/cfdi/emitidos">CFDI Emitidos</Link>
-        )}
-
-        {user && (user.role === "admin" || user.role === "editor") && (
-          <Link to="/cfdi/recibidos">CFDI Recibidos</Link>
-        )}
-
-      </nav>
+    <>
+      {user && !isLoginPage && (
+        <Navbar user={user} onLogout={handleLogout} />
+      )}
 
       <Routes>
-        <Route path="/" element={<Login />} />
+        <Route path="/" element={<Login onLogin={setUser} />} />
         <Route
           path="/register"
           element={
@@ -84,7 +44,6 @@ export default function App() {
             </RoleProtectedRoute>
           }
         />
-
         <Route
           path="/announcements"
           element={
@@ -109,76 +68,102 @@ export default function App() {
             </PrivateRoute>
           }
         />
-      <Route
+        <Route
           path="/admin"
           element={
             <RoleProtectedRoute allowedRoles={["admin"]}>
               <AdminPanel />
             </RoleProtectedRoute>
           }
-      />
-      <Route
-        path="/directory"
-        element={
-          <PrivateRoute>
-            <EmployeeDirectory />
-          </PrivateRoute>
-        }
-      />
-      <Route
-        path="/directory/new"
-        element={
-          <RoleProtectedRoute allowedRoles={["admin", "editor"]}>
-            <NewEmployee />
-          </RoleProtectedRoute>
-        }
-      />
-      <Route
-        path="/directory/edit/:id"
-        element={
-          <RoleProtectedRoute allowedRoles={["admin"]}>
-            <EditEmployee />
-          </RoleProtectedRoute>
-        }
-      />
-      <Route
-        path="/settings"
-        element={
-          <RoleProtectedRoute allowedRoles={["admin", "editor"]}>
-            <SettingsPanel />
-          </RoleProtectedRoute>
-        }
-      />
-      <Route
-        path="/directory/stats"
-        element={
-           <RoleProtectedRoute allowedRoles={["admin", "editor"]}>
-            <EmployeeStats />
-          </RoleProtectedRoute>
-        }
-      />
-      <Route
-        path="/cfdi/emitidos"
-        element={
-          <RoleProtectedRoute allowedRoles={["admin", "editor"]}>
-            <CfdiViewer />
-          </RoleProtectedRoute>
-        }
-      />
-
-      <Route
-        path="/cfdi/recibidos"
-        element={
-          <RoleProtectedRoute allowedRoles={["admin", "editor"]}>
-            <CfdiRecibidos />
-          </RoleProtectedRoute>
-        }
-      />
-
-
+        />
+        <Route
+          path="/directory"
+          element={
+            <PrivateRoute>
+              <EmployeeDirectory />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/directory/new"
+          element={
+            <RoleProtectedRoute allowedRoles={["admin", "editor"]}>
+              <NewEmployee />
+            </RoleProtectedRoute>
+          }
+        />
+        <Route
+          path="/directory/edit/:id"
+          element={
+            <RoleProtectedRoute allowedRoles={["admin"]}>
+              <EditEmployee />
+            </RoleProtectedRoute>
+          }
+        />
+        <Route
+          path="/settings"
+          element={
+            <RoleProtectedRoute allowedRoles={["admin", "editor"]}>
+              <SettingsPanel />
+            </RoleProtectedRoute>
+          }
+        />
+        <Route
+          path="/directory/stats"
+          element={
+            <RoleProtectedRoute allowedRoles={["admin", "editor"]}>
+              <EmployeeStats />
+            </RoleProtectedRoute>
+          }
+        />
+        <Route
+          path="/cfdi/dashboard"
+          element={
+            <RoleProtectedRoute allowedRoles={["admin", "editor"]}>
+              <CfdiDashboard />
+            </RoleProtectedRoute>
+          }
+        />
+        <Route
+          path="/cfdi/emitidos"
+          element={
+            <RoleProtectedRoute allowedRoles={["admin", "editor"]}>
+              <CfdiViewer />
+            </RoleProtectedRoute>
+          }
+        />
+        <Route
+          path="/cfdi/recibidos"
+          element={
+            <RoleProtectedRoute allowedRoles={["admin", "editor"]}>
+              <CfdiRecibidos />
+            </RoleProtectedRoute>
+          }
+        />
       </Routes>
-    </BrowserRouter>
+    </>
   );
 }
 
+export default function App() {
+  const [user, setUser] = useState(null);
 
+  useEffect(() => {
+    const token = getToken();
+    if (!token) return;
+    try {
+      // JWT usa base64url; reemplazar - y _ antes de atob
+      const payload = token.split(".")[1].replace(/-/g, "+").replace(/_/g, "/");
+      const decoded = JSON.parse(atob(payload));
+      setUser(decoded);
+    } catch {
+      // token malformado – no lo borramos para no romper PrivateRoute
+    }
+  }, []);
+
+  return (
+    <BrowserRouter>
+      <AppLayout user={user} setUser={setUser} />
+    </BrowserRouter>
+  );
+}

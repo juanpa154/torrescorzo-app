@@ -1,11 +1,59 @@
 import { useEffect, useState } from "react";
 import {
-  fetchSettings,
-  addAgency,
-  addLocation,
-  deleteAgency,
-  deleteLocation
+  fetchSettings, addAgency, addLocation, deleteAgency, deleteLocation,
 } from "../services/api";
+import "./pages.css";
+import "./SettingsPanel.css";
+
+function TagList({ title, items, newValue, onChangeNew, onAdd, onDelete, placeholder }) {
+  return (
+    <div className="card">
+      <div className="card-header">
+        <h3 className="card-title">{title}</h3>
+        <span className="badge badge--viewer" style={{ marginLeft: "auto" }}>
+          {items.length} registros
+        </span>
+      </div>
+      <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+        <div style={{ display: "flex", gap: "0.5rem" }}>
+          <input
+            type="text"
+            className="form-input"
+            value={newValue}
+            onChange={(e) => onChangeNew(e.target.value)}
+            placeholder={placeholder}
+            onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), onAdd())}
+          />
+          <button className="btn btn--primary" onClick={onAdd} style={{ flexShrink: 0 }}>
+            + Agregar
+          </button>
+        </div>
+
+        {items.length === 0 ? (
+          <div className="empty-state" style={{ padding: "1rem" }}>Sin registros aún</div>
+        ) : (
+          <ul style={{ listStyle: "none", margin: 0, padding: 0, display: "flex", flexDirection: "column", gap: "0.4rem" }}>
+            {items.map((item) => (
+              <li key={item.id} className="settings-tag-item">
+                <span className="settings-tag-name">{item.name}</span>
+                <button
+                  className="btn btn--danger btn--sm"
+                  onClick={async () => {
+                    if (window.confirm(`¿Eliminar "${item.name}"?`)) {
+                      await onDelete(item.id);
+                    }
+                  }}
+                >
+                  Eliminar
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+    </div>
+  );
+}
 
 export default function SettingsPanel() {
   const [agencies, setAgencies] = useState([]);
@@ -14,102 +62,68 @@ export default function SettingsPanel() {
   const [newLocation, setNewLocation] = useState("");
 
   const loadData = async () => {
-    const res = await fetchSettings();
-    setAgencies(res.agencies);
-    setLocations(res.locations);
+    try {
+      const res = await fetchSettings();
+      setAgencies(res.agencies ?? []);
+      setLocations(res.locations ?? []);
+    } catch { /* API error — leave lists empty */ }
   };
 
-  useEffect(() => {
-    loadData();
-  }, []);
+  useEffect(() => { loadData(); }, []);
 
   const handleAddAgency = async () => {
     if (!newAgency.trim()) return;
-    await addAgency(newAgency);
+    await addAgency(newAgency.trim());
     setNewAgency("");
     loadData();
   };
 
   const handleAddLocation = async () => {
     if (!newLocation.trim()) return;
-    await addLocation(newLocation);
+    await addLocation(newLocation.trim());
     setNewLocation("");
     loadData();
   };
 
+  const handleDeleteAgency = async (id) => {
+    await deleteAgency(id);
+    loadData();
+  };
+
+  const handleDeleteLocation = async (id) => {
+    await deleteLocation(id);
+    loadData();
+  };
+
   return (
-    <div className="p-6 max-w-3xl mx-auto">
-      <h2 className="text-2xl font-bold mb-4">Gestión de Agencias y Ubicaciones</h2>
-
-      {/* Agencias */}
-      <section className="mb-6">
-        <h3 className="font-semibold text-lg mb-2">Agencias</h3>
-        <div className="flex gap-2 mb-4">
-          <input
-            type="text"
-            value={newAgency}
-            onChange={(e) => setNewAgency(e.target.value)}
-            placeholder="Nueva agencia"
-            className="p-2 border w-full"
-          />
-          <button onClick={handleAddAgency} className="bg-blue-600 text-white px-4 rounded">
-            Agregar
-          </button>
+    <div className="page" style={{ maxWidth: "800px" }}>
+      <div className="page-header">
+        <div>
+          <h1 className="page-title">Configurar <span>Etiquetas</span></h1>
+          <p className="page-subtitle">Administra agencias y ubicaciones del directorio</p>
         </div>
-        <ul className="space-y-2">
-          {agencies.map((a) => (
-            <li key={a.id} className="flex justify-between items-center border p-2 rounded">
-              <span>{a.name}</span>
-              <button
-                onClick={async () => {
-                  if (confirm("¿Eliminar esta agencia?")) {
-                    await deleteAgency(a.id);
-                    loadData();
-                  }
-                }}
-                className="text-sm bg-red-500 text-white px-2 py-1 rounded"
-              >
-                Eliminar
-              </button>
-            </li>
-          ))}
-        </ul>
-      </section>
+      </div>
 
-      {/* Ubicaciones */}
-      <section>
-        <h3 className="font-semibold text-lg mb-2">Ubicaciones</h3>
-        <div className="flex gap-2 mb-4">
-          <input
-            type="text"
-            value={newLocation}
-            onChange={(e) => setNewLocation(e.target.value)}
-            placeholder="Nueva ubicación"
-            className="p-2 border w-full"
-          />
-          <button onClick={handleAddLocation} className="bg-blue-600 text-white px-4 rounded">
-            Agregar
-          </button>
-        </div>
-        <ul className="space-y-2">
-          {locations.map((l) => (
-            <li key={l.id} className="flex justify-between items-center border p-2 rounded">
-              <span>{l.name}</span>
-              <button
-                onClick={async () => {
-                  if (confirm("¿Eliminar esta ubicación?")) {
-                    await deleteLocation(l.id);
-                    loadData();
-                  }
-                }}
-                className="text-sm bg-red-500 text-white px-2 py-1 rounded"
-              >
-                Eliminar
-              </button>
-            </li>
-          ))}
-        </ul>
-      </section>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.5rem" }}>
+        <TagList
+          title="Agencias"
+          items={agencies}
+          newValue={newAgency}
+          onChangeNew={setNewAgency}
+          onAdd={handleAddAgency}
+          onDelete={handleDeleteAgency}
+          placeholder="Nueva agencia..."
+        />
+        <TagList
+          title="Ubicaciones"
+          items={locations}
+          newValue={newLocation}
+          onChangeNew={setNewLocation}
+          onAdd={handleAddLocation}
+          onDelete={handleDeleteLocation}
+          placeholder="Nueva ubicación..."
+        />
+      </div>
     </div>
   );
 }

@@ -29,8 +29,14 @@ const cfdiRoutes = require('./src/routes/cfdi.routes');
 app.use('/api/cfdi', cfdiRoutes);
 
 
-const classifierRoutes = require('./src/routes/cfdiClassifier.routes'); 
+const classifierRoutes = require('./src/routes/cfdiClassifier.routes');
 app.use('/api/ia', classifierRoutes);
+
+const syncRoutes = require('./src/routes/sync.routes');
+app.use('/api/sync', syncRoutes);
+
+const cfdiDashboardRoutes = require('./src/routes/cfdiDashboard.routes');
+app.use('/api/cfdi-dashboard', cfdiDashboardRoutes);
 
 app.get('/', (req, res) => {
   res.send('API funcionando 🚀');

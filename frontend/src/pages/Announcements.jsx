@@ -1,29 +1,69 @@
 import { useEffect, useState } from "react";
+import "./pages.css";
+import "./Announcements.css";
 
 export default function Announcements() {
   const [announcements, setAnnouncements] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchAnnouncements = async () => {
-      const res = await fetch("http://localhost:3000/api/announcements");
-      const data = await res.json();
-      setAnnouncements(data);
+      try {
+        const res = await fetch("http://localhost:3000/api/announcements");
+        const data = await res.json();
+        setAnnouncements(data);
+      } finally {
+        setLoading(false);
+      }
     };
     fetchAnnouncements();
   }, []);
 
+  function formatDate(iso) {
+    if (!iso) return "";
+    return new Date(iso).toLocaleDateString("es-MX", {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    });
+  }
+
   return (
-    <div className="p-6 max-w-4xl mx-auto">
-      <h2 className="text-3xl font-bold mb-6 text-blue-700">Anuncios</h2>
-      <div className="space-y-4">
-        {announcements.map((a) => (
-          <div key={a.id} className="p-4 border rounded shadow bg-white">
-            <h3 className="text-xl font-semibold">{a.title}</h3>
-            <p className="text-gray-700">{a.content}</p>
-            <p className="text-sm text-gray-500 mt-2">
-              Publicado por: {a.author.email}
-            </p>
+    <div className="page">
+      <div className="page-header">
+        <div>
+          <h1 className="page-title">Anuncios</h1>
+          <p className="page-subtitle">Comunicados internos de Grupo Torres Corzo</p>
+        </div>
+      </div>
+
+      {loading && (
+        <div className="page-loading">Cargando anuncios...</div>
+      )}
+
+      {!loading && announcements.length === 0 && (
+        <div className="card">
+          <div className="empty-state">
+            <span>Sin anuncios publicados</span>
           </div>
+        </div>
+      )}
+
+      <div className="ann-list">
+        {announcements.map((a) => (
+          <article key={a.id} className="ann-card card">
+            <div className="ann-card__accent" />
+            <div className="card-body">
+              <h3 className="ann-card__title">{a.title}</h3>
+              <p className="ann-card__content">{a.content}</p>
+              <div className="ann-card__meta">
+                <span className="ann-card__author">{a.author?.email}</span>
+                {a.createdAt && (
+                  <span className="ann-card__date">{formatDate(a.createdAt)}</span>
+                )}
+              </div>
+            </div>
+          </article>
         ))}
       </div>
     </div>

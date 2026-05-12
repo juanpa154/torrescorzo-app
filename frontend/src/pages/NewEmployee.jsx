@@ -1,145 +1,124 @@
-import { useState } from "react";
-import { useEffect } from "react"; 
-import { createEmployee } from "../services/api";
+import { useState, useEffect } from "react";
+import { createEmployee, fetchSettings } from "../services/api";
 import { useNavigate } from "react-router-dom";
-import { fetchSettings } from "../services/api";
+import "./pages.css";
 
-
-
-
-
+const EMPTY_FORM = { name: "", email: "", phone: "", position: "", location: "", agency: "" };
 
 export default function NewEmployee() {
-  const [form, setForm] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    position: "",
-    location: "",
-    agency: ""
-  });
-
-  const [message, setMessage] = useState("");
+  const [form, setForm] = useState(EMPTY_FORM);
   const [agencies, setAgencies] = useState([]);
   const [locations, setLocations] = useState([]);
-
+  const [status, setStatus] = useState(null);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  
-  useEffect(() => {
-      const loadSettings = async () => {
-        const res = await fetchSettings();
-        setAgencies(res.agencies);
-        setLocations(res.locations);
-      };
-      loadSettings();
-    }, []);
 
-  
-  const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
+  useEffect(() => {
+    fetchSettings().then((res) => {
+      setAgencies(res.agencies ?? []);
+      setLocations(res.locations ?? []);
+    });
+  }, []);
+
+  const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    const res = await createEmployee(form);
-    setLoading(false);
-
-    if (res.id) {
-      setMessage("Empleado creado ✅");
-      setForm({
-        name: "",
-        email: "",
-        phone: "",
-        position: "",
-        location: "",
-        agency: ""
-      });
-      setTimeout(() => navigate("/directory"), 1000);
-    } else {
-      setMessage(res.message || "Error al crear empleado");
+    setStatus(null);
+    try {
+      const res = await createEmployee(form);
+      if (res.id) {
+        setStatus({ type: "success", msg: "Empleado creado correctamente." });
+        setForm(EMPTY_FORM);
+        setTimeout(() => navigate("/directory"), 1200);
+      } else {
+        setStatus({ type: "error", msg: res.message || "Error al crear el empleado." });
+      }
+    } catch {
+      setStatus({ type: "error", msg: "Error de conexión." });
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="p-6 max-w-md mx-auto">
-      <h2 className="text-xl font-bold mb-4">Nuevo Empleado</h2>
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <input
-          name="name"
-          placeholder="Nombre"
-          className="w-full p-2 border"
-          value={form.name}
-          onChange={handleChange}
-          required
-        />
-        <input
-          name="email"
-          type="email"
-          placeholder="Correo"
-          className="w-full p-2 border"
-          value={form.email}
-          onChange={handleChange}
-          required
-        />
-        <input
-          name="phone"
-          placeholder="Teléfono"
-          className="w-full p-2 border"
-          value={form.phone}
-          onChange={handleChange}
-        />
-        <input
-          name="position"
-          placeholder="Puesto"
-          className="w-full p-2 border"
-          value={form.position}
-          onChange={handleChange}
-          required
-        />
+    <div className="page page--narrow">
+      <div className="page-header">
+        <div>
+          <h1 className="page-title">Nuevo <span>Empleado</span></h1>
+          <p className="page-subtitle">Registra un nuevo colaborador en el directorio</p>
+        </div>
+      </div>
 
-        <select
-          name="location"
-          value={form.location}
-          onChange={handleChange}
-          className="w-full p-2 border"
-          required
-        >
-          <option value="">Selecciona ubicación</option>
-          {locations.map((l) => (
-            <option key={l.id} value={l.name}>
-              {l.name}
-            </option>
-          ))}
+      <div className="card">
+        <div className="card-body">
+          <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "1.1rem" }}>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
+              <div className="form-group">
+                <label className="form-label" htmlFor="emp-name">Nombre completo</label>
+                <input id="emp-name" name="name" className="form-input" placeholder="Nombre Apellido"
+                  value={form.name} onChange={handleChange} required />
+              </div>
+              <div className="form-group">
+                <label className="form-label" htmlFor="emp-pos">Puesto</label>
+                <input id="emp-pos" name="position" className="form-input" placeholder="Ej: Asesor de ventas"
+                  value={form.position} onChange={handleChange} required />
+              </div>
+            </div>
 
-        </select>
+            <div className="form-group">
+              <label className="form-label" htmlFor="emp-email">Correo electrónico</label>
+              <input id="emp-email" name="email" type="email" className="form-input"
+                placeholder="empleado@torrescorzo.com" value={form.email} onChange={handleChange} required />
+            </div>
 
-        <select
-          name="agency"
-          value={form.agency}
-          onChange={handleChange}
-          className="w-full p-2 border"
-          required
-        >
-          <option value="">Selecciona agencia</option>
-          {agencies.map((a) => (
-            <option key={a.id} value={a.name}>
-              {a.name}
-            </option>
-          ))}
+            <div className="form-group">
+              <label className="form-label" htmlFor="emp-phone">Teléfono</label>
+              <input id="emp-phone" name="phone" className="form-input" placeholder="Opcional"
+                value={form.phone} onChange={handleChange} />
+            </div>
 
-        </select>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
+              <div className="form-group">
+                <label className="form-label" htmlFor="emp-location">Ubicación</label>
+                <select id="emp-location" name="location" className="form-select"
+                  value={form.location} onChange={handleChange} required>
+                  <option value="">Selecciona...</option>
+                  {locations.map((l) => (
+                    <option key={l.id} value={l.name}>{l.name}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="form-group">
+                <label className="form-label" htmlFor="emp-agency">Agencia</label>
+                <select id="emp-agency" name="agency" className="form-select"
+                  value={form.agency} onChange={handleChange} required>
+                  <option value="">Selecciona...</option>
+                  {agencies.map((a) => (
+                    <option key={a.id} value={a.name}>{a.name}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
 
-        <button
-          type="submit"
-          disabled={loading}
-          className="bg-blue-600 text-white w-full p-2 rounded disabled:opacity-50"
-        >
-          {loading ? "Guardando..." : "Crear empleado"}
-        </button>
-      </form>
-      {message && <p className="text-center mt-4">{message}</p>}
+            {status && (
+              <div className={`alert alert--${status.type === "success" ? "success" : "error"}`}>
+                {status.msg}
+              </div>
+            )}
+
+            <div style={{ display: "flex", gap: "0.75rem", paddingTop: "0.5rem" }}>
+              <button type="submit" className="btn btn--primary" disabled={loading}>
+                {loading ? "Guardando..." : "Crear empleado"}
+              </button>
+              <button type="button" className="btn btn--secondary" onClick={() => navigate("/directory")}>
+                Cancelar
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
     </div>
   );
 }
