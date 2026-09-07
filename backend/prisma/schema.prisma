@@ -10,11 +10,12 @@ datasource db {
 }
 
 model User {
-  id       Int      @id @default(autoincrement())
-  email    String   @unique
-  password String
-  role     String   @default("viewer")
-  createdAt DateTime @default(now())
+  id           Int      @id @default(autoincrement())
+  email        String   @unique
+  password     String
+  role         String   @default("viewer")
+  agencySchema String?
+  createdAt    DateTime @default(now())
 
   announcements Announcement[]
 }
@@ -108,5 +109,164 @@ model SyncEstado {
 
   @@unique([schema, tipoCfdi])
   @@map("sync_estados")
+}
+
+// ─── Fase 1-C: Registro de Códigos (FrmCodigos) ────────────────────────────
+
+model Codigo {
+  id            Int       @id @default(autoincrement())
+  agencySchema  String    @db.VarChar(50)
+  // "99999" es registro especial: codPos guarda el siguiente número disponible
+  codigo        String    @db.VarChar(5)
+  razSoc        String?   @db.VarChar(200)
+  paterno       String?   @db.VarChar(100)
+  materno       String?   @db.VarChar(100)
+  nombre        String?   @db.VarChar(100)
+  rfc           String?   @db.VarChar(13)
+  regFis        String?   @db.VarChar(10)
+  regSoc        String?   @db.VarChar(10)
+  direccion     String?   @db.VarChar(200)
+  noExterior    String?   @db.VarChar(20)
+  colonia       String?   @db.VarChar(100)
+  codPos        String?   @db.VarChar(5)
+  ciudad        String?   @db.VarChar(100)
+  estado        String?   @db.VarChar(50)
+  municipio     String?   @db.VarChar(100)
+  lada          String?   @db.VarChar(5)
+  telefono      String?   @db.VarChar(20)
+  movil         String?   @db.VarChar(20)
+  formaPago     String?   @db.VarChar(5)
+  ctaPagadora   String?   @db.VarChar(50)
+  limCred       Decimal?  @db.Decimal(18, 2)
+  dias          Int?
+  tipo          String?   @default("P") @db.VarChar(5)
+  convenio      Boolean   @default(false)
+  acumRef       Decimal?  @db.Decimal(18, 2)
+  acumSer       Decimal?  @db.Decimal(18, 2)
+  contado       Boolean   @default(false)
+  stContacto    Int?
+  clasif        String?   @db.VarChar(5)
+  fechaNac      DateTime?
+  fechaAlta     DateTime?
+  email         String?   @db.VarChar(100)
+  email2        String?   @db.VarChar(100)
+  noId          String?   @db.VarChar(50)
+  observaciones String?
+  curp          String?   @db.VarChar(18)
+  sexo          String?   @db.VarChar(1)
+  escolaridad   String?   @db.VarChar(5)
+  edoCivil      String?   @db.VarChar(5)
+  titulo        String?   @db.VarChar(5)
+  redSoc1       String?   @db.VarChar(200)
+  redSoc2       String?   @db.VarChar(200)
+  redSoc3       String?   @db.VarChar(200)
+  ladaOf        String?   @db.VarChar(5)
+  telOficina    String?   @db.VarChar(20)
+  extTelOfi     String?   @db.VarChar(10)
+  pasatiempo1   String?   @db.VarChar(100)
+  pasatiempo2   String?   @db.VarChar(100)
+  repLegal      String?   @db.VarChar(200)
+  dv            String?   @db.VarChar(20)
+  imgId         Bytes?
+
+  @@unique([agencySchema, codigo])
+  @@index([agencySchema, rfc])
+  @@index([agencySchema, nombre])
+  @@index([agencySchema, razSoc])
+  @@map("codigos")
+}
+
+model TipoCod {
+  tipo    String @id @db.VarChar(5)
+  descrip String @db.VarChar(100)
+
+  @@map("tipo_cod")
+}
+
+model ComCred {
+  clasif  String @id @db.VarChar(5)
+  descrip String @db.VarChar(100)
+
+  @@map("com_cred")
+}
+
+model CatEntidadFederativa {
+  codEstado    String @id @db.VarChar(3)
+  nombreEstado String @db.VarChar(100)
+  abreviacion  String @db.VarChar(10)
+
+  @@map("cat_entidades_federativas")
+}
+
+model Escolaridad {
+  clave    String  @id @db.VarChar(5)
+  descrip  String  @db.VarChar(100)
+  clNissan String? @db.VarChar(10)
+  clKia    String? @db.VarChar(10)
+
+  @@map("escolaridades")
+}
+
+model Civil {
+  clave    String  @id @db.VarChar(5)
+  descrip  String  @db.VarChar(100)
+  clNissan String? @db.VarChar(10)
+  clKia    String? @db.VarChar(10)
+
+  @@map("estados_civiles")
+}
+
+model Titulo {
+  clave    String  @id @db.VarChar(5)
+  descrip  String  @db.VarChar(100)
+  clNissan String? @db.VarChar(10)
+  clKia    String? @db.VarChar(10)
+
+  @@map("titulos")
+}
+
+model CatRegimenFis {
+  cRegimenFiscal String  @id @db.VarChar(10)
+  regimenFiscal  String  @db.VarChar(200)
+  fisica         Boolean @default(false)
+  moral          Boolean @default(false)
+
+  @@map("cat_regimen_fiscal")
+}
+
+model CatRegimenSoc {
+  cRegimenSoc       String @id @db.VarChar(10)
+  regimenSocietario String @db.VarChar(200)
+  abreviatura       String @db.VarChar(50)
+
+  @@map("cat_regimen_societario")
+}
+
+model CatColonia {
+  id         Int    @id @default(autoincrement())
+  codColonia String @db.VarChar(10)
+  codCiudad  String @db.VarChar(10)
+  codEstado  String @db.VarChar(3)
+  nomColonia String @db.VarChar(200)
+  cp         String @db.VarChar(5)
+
+  @@index([cp])
+  @@index([codEstado, codCiudad])
+  @@map("cat_colonias")
+}
+
+model CatCodPos {
+  cCodigoPostal String @id @db.VarChar(5)
+  cEstado       String @db.VarChar(3)
+
+  @@map("cat_cod_pos")
+}
+
+model CatCiudad {
+  codCiudad    String @id @db.VarChar(10)
+  codEstado    String @db.VarChar(3)
+  nombreCiudad String @db.VarChar(100)
+
+  @@map("cat_ciudades")
 }
 

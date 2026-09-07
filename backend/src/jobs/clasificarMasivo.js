@@ -1,8 +1,7 @@
-const { PrismaClient } = require('@prisma/client');
+const { prisma } = require('../db/prismaClient');
 const getCfdiClient = require('../db/cfdiClient');
 const { clasificarLoteCfdi } = require('../helpers/cfdiClassifier');
-
-const prisma = new PrismaClient();
+const logger = require('../config/logger').default;
 
 const MODEL_MAP = {
   emitidos: 'cfdiEmitido',
@@ -37,7 +36,7 @@ async function clasificarDesdeLocal(schema, limiteCuantos, tipo, modelName) {
     select: { id: true, uuid: true, conceptos: true }
   });
 
-  console.log(`[Clasificar-Local] ${schema}/${tipo}: ${registros.length} CFDI(s) sin clasificar`);
+  logger.info({ schema, tipo, pendientes: registros.length }, '[Clasificar-Local] CFDI(s) sin clasificar');
   if (registros.length === 0) return { clasificados: 0 };
 
   const categorias = await clasificarLoteCfdi(registros.map(r => r.conceptos));
@@ -65,14 +64,14 @@ async function clasificarDesdeLocal(schema, limiteCuantos, tipo, modelName) {
         await client.query(
           `UPDATE ing_eg_rec SET categoria_ia = $1 WHERE uuid = $2`,
           [categorias[i], registros[i].uuid]
-        ).catch(err => console.error(`[Clasificar] Error remoto ${registros[i].uuid}:`, err.message));
+        ).catch(err => logger.error({ err, uuid: registros[i].uuid }, '[Clasificar] Error remoto'));
       }
     } finally {
       await client.end();
     }
   }
 
-  console.log(`[Clasificar-Local] Clasificados: ${registros.length}`);
+  logger.info({ clasificados: registros.length }, '[Clasificar-Local] Clasificados');
   return { clasificados: registros.length };
 }
 
@@ -87,7 +86,7 @@ async function clasificarDesdeRemoto(schema, limiteCuantos) {
       [limiteCuantos]
     );
 
-    console.log(`[Clasificar-Remoto] ${schema}: ${rows.length} CFDI(s) sin clasificar`);
+    logger.info({ schema, pendientes: rows.length }, '[Clasificar-Remoto] CFDI(s) sin clasificar');
     if (rows.length === 0) return { clasificados: 0 };
 
     const categorias = await clasificarLoteCfdi(rows.map(r => r.conceptos));
@@ -100,7 +99,7 @@ async function clasificarDesdeRemoto(schema, limiteCuantos) {
       await client.query(
         `UPDATE ing_eg_rec SET categoria_ia = $1 WHERE uuid = $2`,
         [categorias[i], rows[i].uuid]
-      ).catch(err => console.error(`[Clasificar] Error ${rows[i].uuid}:`, err.message));
+      ).catch(err => logger.error({ err, uuid: rows[i].uuid }, '[Clasificar] Error'));
     }
 
     return { clasificados: rows.length };

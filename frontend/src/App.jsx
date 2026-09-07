@@ -8,6 +8,7 @@ import NewAnnouncement from "./pages/NewAnnouncement";
 import Dashboard from "./pages/Dashboard";
 import RoleProtectedRoute from "./components/RoleProtectedRoute";
 import { getToken } from "./services/api";
+import { decodeToken } from "./utils/jwt";
 import AdminPanel from "./pages/AdminPanel";
 import EmployeeDirectory from "./pages/EmployeeDirectory";
 import NewEmployee from "./pages/NewEmployee";
@@ -17,6 +18,7 @@ import EmployeeStats from "./pages/EmployeeStats";
 import CfdiViewer from "./pages/CfdiViewer";
 import CfdiRecibidos from "./pages/CfdiRecibidos";
 import CfdiDashboard from "./pages/CfdiDashboard";
+import CodigosForm from "./pages/CodigosForm";
 import Navbar from "./components/Navbar";
 
 function AppLayout({ user, setUser }) {
@@ -140,6 +142,14 @@ function AppLayout({ user, setUser }) {
             </RoleProtectedRoute>
           }
         />
+        <Route
+          path="/codigos"
+          element={
+            <PrivateRoute>
+              <CodigosForm />
+            </PrivateRoute>
+          }
+        />
       </Routes>
     </>
   );
@@ -149,16 +159,9 @@ export default function App() {
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-    const token = getToken();
-    if (!token) return;
-    try {
-      // JWT usa base64url; reemplazar - y _ antes de atob
-      const payload = token.split(".")[1].replace(/-/g, "+").replace(/_/g, "/");
-      const decoded = JSON.parse(atob(payload));
-      setUser(decoded);
-    } catch {
-      // token malformado – no lo borramos para no romper PrivateRoute
-    }
+    const decoded = decodeToken(getToken());
+    // token ausente o malformado – no lo borramos para no romper PrivateRoute
+    if (decoded) setUser(decoded);
   }, []);
 
   return (

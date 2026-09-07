@@ -1,7 +1,5 @@
-const { PrismaClient } = require('@prisma/client');
+const { prisma } = require('../db/prismaClient');
 const getCfdiPool = require('../db/cfdiPool');
-
-const prisma = new PrismaClient();
 
 function toNum(v) {
   if (v === null || v === undefined) return 0;

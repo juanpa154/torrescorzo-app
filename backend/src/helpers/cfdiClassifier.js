@@ -1,6 +1,4 @@
-const { OpenAI } = require('openai');
-
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+const { openai } = require('../config/openaiClient');
 
 const CATEGORIAS = [
   'Combustible', 'Vehículos Nuevos', 'Refacciones y mantenimiento',

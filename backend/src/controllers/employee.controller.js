@@ -1,7 +1,4 @@
-const { PrismaClient } = require('@prisma/client');
-const prisma = new PrismaClient();
-
-
+const { prisma } = require('../db/prismaClient');
 const {
   getAllEmployees,
   createEmployee,
@@ -9,15 +6,13 @@ const {
   deleteEmployee,
 } = require('../models/employee.model');
 
+// Autorización ya resuelta en employee.routes.js vía requireRole(...ROLE_GROUPS)
 const list = async (_req, res) => {
   const data = await getAllEmployees();
   res.json(data);
 };
 
 const create = async (req, res) => {
-  const user = req.user;
-  if (user.role === "viewer") return res.status(403).json({ message: "No autorizado" });
-
   const existing = await prisma.employee.findUnique({
     where: { email: req.body.email }
   });
@@ -28,19 +23,12 @@ const create = async (req, res) => {
   res.status(201).json(employee);
 };
 
-
 const update = async (req, res) => {
-  const user = req.user;
-  if (user.role !== "admin") return res.status(403).json({ message: "Solo admin puede editar" });
-
   const employee = await updateEmployee(req.params.id, req.body);
   res.json(employee);
 };
 
 const remove = async (req, res) => {
-  const user = req.user;
-  if (user.role !== "admin") return res.status(403).json({ message: "Solo admin puede eliminar" });
-
   await deleteEmployee(req.params.id);
   res.json({ message: "Empleado eliminado" });
 };

@@ -1,4 +1,5 @@
 const client = require("../db/remoteClient");
+const logger = require('../config/logger').default;
 
 const listVencimientos = async (req, res) => {
   const { cuent, desde, hasta } = req.query;
@@ -25,7 +26,7 @@ const listVencimientos = async (req, res) => {
     const result = await client.query(query, values);
     res.json(result.rows);
   } catch (err) {
-    console.error(err);
+    logger.error({ err }, 'Error al consultar vencimientos');
     res.status(500).json({ message: "Error al consultar vencimientos" });
   }
 };

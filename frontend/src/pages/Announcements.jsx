@@ -1,22 +1,18 @@
 import { useEffect, useState } from "react";
+import { fetchAnnouncements } from "../services/api";
 import "./pages.css";
 import "./Announcements.css";
 
 export default function Announcements() {
   const [announcements, setAnnouncements] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
 
   useEffect(() => {
-    const fetchAnnouncements = async () => {
-      try {
-        const res = await fetch("http://localhost:3000/api/announcements");
-        const data = await res.json();
-        setAnnouncements(data);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchAnnouncements();
+    fetchAnnouncements()
+      .then(setAnnouncements)
+      .catch(() => setError(true))
+      .finally(() => setLoading(false));
   }, []);
 
   function formatDate(iso) {
@@ -41,7 +37,15 @@ export default function Announcements() {
         <div className="page-loading">Cargando anuncios...</div>
       )}
 
-      {!loading && announcements.length === 0 && (
+      {!loading && error && (
+        <div className="card">
+          <div className="empty-state">
+            <span>Error al cargar anuncios. Intenta de nuevo más tarde.</span>
+          </div>
+        </div>
+      )}
+
+      {!loading && !error && announcements.length === 0 && (
         <div className="card">
           <div className="empty-state">
             <span>Sin anuncios publicados</span>

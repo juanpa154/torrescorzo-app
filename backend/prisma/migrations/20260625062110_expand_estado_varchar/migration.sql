@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "codigos" ALTER COLUMN "estado" SET DATA TYPE VARCHAR(50);

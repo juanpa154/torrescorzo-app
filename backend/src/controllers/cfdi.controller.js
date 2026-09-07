@@ -1,7 +1,6 @@
-const { PrismaClient } = require('@prisma/client');
+const { prisma } = require('../db/prismaClient');
 const getCfdiClient = require('../db/cfdiClient');
-
-const prisma = new PrismaClient();
+const logger = require('../config/logger').default;
 
 const CATEGORIAS_IA = [
   'Combustible', 'Vehículos Nuevos', 'Refacciones y mantenimiento',
@@ -160,7 +159,7 @@ async function getCfdiIngresosRemoto(schema, page = 1, limit = 50, filtros = {})
       fuente: 'remoto'
     };
   } catch (error) {
-    console.error(`Error al consultar ingresos para el esquema "${schema}":`, error);
+    logger.error({ err: error, schema }, 'Error al consultar ingresos');
     throw error;
   } finally {
     await client.end();
@@ -291,7 +290,7 @@ async function getCfdiRecibidosRemoto(schema, page = 1, limit = 50, filtros = {}
       fuente: 'remoto'
     };
   } catch (error) {
-    console.error(`Error al consultar recibidos para el esquema "${schema}":`, error);
+    logger.error({ err: error, schema }, 'Error al consultar recibidos');
     throw error;
   } finally {
     await client.end();

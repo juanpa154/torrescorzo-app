@@ -1,5 +1,4 @@
-const { PrismaClient } = require('@prisma/client');
-const prisma = new PrismaClient();
+const { prisma } = require('../db/prismaClient');
 
 const createAnnouncement = async ({ title, content, userId }) => {
   return await prisma.announcement.create({

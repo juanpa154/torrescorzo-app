@@ -1,7 +1,8 @@
-const { PrismaClient } = require('@prisma/client');
+const { prisma } = require('../db/prismaClient');
 const getCfdiPool = require('../db/cfdiPool');
-
-const prisma = new PrismaClient();
+// console.* deliberado aquí, no el logger Pino: cfdiSync.service.test.ts usa
+// createRequire() para compartir el module cache nativo de Node con sus mocks,
+// lo que no puede resolver ../config/logger.ts (ni su import de env.ts).
 
 const TABLA_MAP = {
   emitidos: 'ing_eg_emi',

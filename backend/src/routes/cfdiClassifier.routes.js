@@ -1,23 +1,30 @@
 const express = require('express');
 const { clasificarCfdisSinCategoria } = require('../jobs/clasificarMasivo');
+const { authenticateToken } = require('../middlewares/auth.middleware');
+const { requireRole } = require('../middlewares/authorize.middleware');
+const { validateQuery } = require('../middlewares/validate');
+const validateSchema = require('../middlewares/validateSchema');
+const { clasificarQuerySchema } = require('../schemas/cfdi.schema');
+const { ROLE_GROUPS } = require('../config/roles');
+const logger = require('../config/logger').default;
 const router = express.Router();
 
-// GET /api/ia/clasificar?schema=kia_zacatecas&tipo=recibidos|emitidos&limit=50
-router.get('/clasificar', async (req, res) => {
-  const { schema, tipo = 'recibidos', limit } = req.query;
-  if (!schema) {
-    return res.status(400).json({ error: 'Falta el parámetro schema' });
-  }
+router.get('/clasificar',
+  authenticateToken,
+  requireRole(...ROLE_GROUPS.FINANZAS_WRITE),
+  validateSchema,
+  validateQuery(clasificarQuerySchema),
+  async (req, res) => {
+    const { schema, tipo, limit } = req.validatedQuery;
 
-  const cantidad = parseInt(limit, 10) || 1000;
-
-  try {
-    const resultado = await clasificarCfdisSinCategoria(schema, cantidad, tipo);
-    res.json({ ...resultado, schema, tipo, limite: cantidad });
-  } catch (err) {
-    console.error('[Clasificar] Error:', err.message);
-    res.status(500).json({ error: err.message });
+    try {
+      const resultado = await clasificarCfdisSinCategoria(schema, limit, tipo);
+      res.json({ ...resultado, schema, tipo, limite: limit });
+    } catch (err) {
+      logger.error({ err }, '[Clasificar] Error');
+      res.status(500).json({ error: err.message });
+    }
   }
-});
+);
 
 module.exports = router;

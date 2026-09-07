@@ -33,6 +33,14 @@ const MENU_GROUPS = [
       { label: "Recibidos", path: "/cfdi/recibidos", roles: ["admin", "editor"] },
     ],
   },
+  {
+    id: "dms",
+    label: "DMS",
+    roles: ["admin", "editor", "ventas", "servicio", "contador", "gerente", "consulta", "viewer"],
+    items: [
+      { label: "Registro de Códigos", path: "/codigos", roles: ["admin", "editor", "ventas", "servicio", "contador", "gerente", "consulta", "viewer"] },
+    ],
+  },
 ];
 
 function hasAccess(roles, userRole) {

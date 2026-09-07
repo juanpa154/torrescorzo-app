@@ -1,5 +1,4 @@
-const { PrismaClient } = require('@prisma/client');
-const prisma = new PrismaClient();
+const { prisma } = require('../db/prismaClient');
 
 const getAgencies = async () => await prisma.agency.findMany({ orderBy: { name: 'asc' } });
 const getLocations = async () => await prisma.location.findMany({ orderBy: { name: 'asc' } });

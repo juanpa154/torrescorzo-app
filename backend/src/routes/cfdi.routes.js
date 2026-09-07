@@ -1,70 +1,54 @@
 const express = require('express');
 const router = express.Router();
-const { getCfdiIngresos } = require('../controllers/cfdi.controller');
-const { getCfdiRecibidos } = require('../controllers/cfdi.controller')
+const { getCfdiIngresos, getCfdiRecibidos } = require('../controllers/cfdi.controller');
+const { authenticateToken } = require('../middlewares/auth.middleware');
+const { requireRole } = require('../middlewares/authorize.middleware');
+const { validateQuery } = require('../middlewares/validate');
+const validateSchema = require('../middlewares/validateSchema');
+const { cfdiQuerySchema } = require('../schemas/cfdi.schema');
+const { ROLE_GROUPS } = require('../config/roles');
+const logger = require('../config/logger').default;
 
-router.get('/:schema/ingresos', async (req, res) => {
-  const { schema } = req.params;
-  const page = parseInt(req.query.page) || 1;
-  const limit = Math.min(parseInt(req.query.limit) || 50, 10000);
+router.get('/:schema/ingresos',
+  authenticateToken,
+  requireRole(...ROLE_GROUPS.FINANZAS_READ),
+  validateSchema,
+  validateQuery(cfdiQuerySchema),
+  async (req, res) => {
+    const { schema } = req.params;
+    const { page, limit, mes, anio, tipo, rfc, minMonto, maxMonto, categoriaIa } = req.validatedQuery;
 
-  // Captura de filtros
-  const mes = req.query.mes ? parseInt(req.query.mes) : null;
-  const anio = req.query.anio ? parseInt(req.query.anio) : null;
-  const tipo = req.query.tipo || null;
-  const rfc = req.query.rfc || null;
-  const minMonto = req.query.minMonto || null;
-  const maxMonto = req.query.maxMonto || null;
-  const categoriaIa = req.query.categoriaIa || null;
-
-  try {
-    const result = await getCfdiIngresos(schema, page, limit, {
-      mes,
-      anio,
-      tipo,
-      rfc,
-      minMonto,
-      maxMonto,
-      categoriaIa
-    });
-
-    res.json(result);
-  } catch (error) {
-    console.error('Error al obtener ingresos:', error);
-    res.status(500).json({ message: 'Error al obtener los CFDI de ingresos' });
+    try {
+      const result = await getCfdiIngresos(schema, page, limit, {
+        mes, anio, tipo, rfc, minMonto, maxMonto, categoriaIa
+      });
+      res.json(result);
+    } catch (error) {
+      logger.error({ err: error }, 'Error al obtener ingresos');
+      res.status(500).json({ message: 'Error al obtener los CFDI de ingresos' });
+    }
   }
-});
+);
 
-router.get('/:schema/recibidos', async (req, res) => {
-  const { schema } = req.params;
-  const page = parseInt(req.query.page) || 1;
-  const limit = Math.min(parseInt(req.query.limit) || 50, 10000);
+router.get('/:schema/recibidos',
+  authenticateToken,
+  requireRole(...ROLE_GROUPS.FINANZAS_READ),
+  validateSchema,
+  validateQuery(cfdiQuerySchema),
+  async (req, res) => {
+    const { schema } = req.params;
+    const { page, limit, mes, anio, tipo, rfc, minMonto, maxMonto, categoriaIa } = req.validatedQuery;
 
-  // Captura de filtros
-  const mes = req.query.mes ? parseInt(req.query.mes) : null;
-  const anio = req.query.anio ? parseInt(req.query.anio) : null;
-  const tipo = req.query.tipo || null;
-  const rfc = req.query.rfc || null;
-  const minMonto = req.query.minMonto || null;
-  const maxMonto = req.query.maxMonto || null;
-  const categoriaIa = req.query.categoriaIa || null;
-
-  try {
-    const result = await getCfdiRecibidos(schema, page, limit, {
-      mes,
-      anio,
-      tipo,
-      rfc,
-      minMonto,
-      maxMonto,
-      categoriaIa
-    });
-
-    res.json(result);
-  } catch (error) {
-    console.error('Error al obtener recibidos:', error);
-    res.status(500).json({ message: 'Error al obtener los CFDI de recibidos' });
+    try {
+      const result = await getCfdiRecibidos(schema, page, limit, {
+        mes, anio, tipo, rfc, minMonto, maxMonto, categoriaIa
+      });
+      res.json(result);
+    } catch (error) {
+      logger.error({ err: error }, 'Error al obtener recibidos');
+      res.status(500).json({ message: 'Error al obtener los CFDI de recibidos' });
+    }
   }
-});
+);
 
 module.exports = router;
