@@ -4,6 +4,25 @@ Log cronológico de sesiones de trabajo. La entrada más reciente va al inicio.
 
 ---
 
+## 2026-09-07 — Deploy real en Railway: fix `node-adodb` + hallazgo Vencimientos desconectado
+
+**Hecho:**
+- Primer intento de deploy del backend en Railway falló en `npm install`: `EBADPLATFORM` — `node-adodb@5.0.3` (dependencia de `backend/src/db.js`, ya desconectado de `index.js` desde la sesión de auditoría) solo declara soporte `win32`, y npm rechaza instalarlo en cualquier plataforma sin importar si el código lo usa. Corregido moviéndolo de `dependencies` a `optionalDependencies` en `backend/package.json` — npm lo omite silenciosamente en Linux (Railway) pero lo sigue instalando en Windows (necesario para correr `prisma/etl-codigos-mdb.js` localmente). Lockfile regenerado, 97/97 tests siguen pasando.
+- Al llenar las variables de entorno remanentes en Railway, se descubrió que **Vencimientos está desconectado del frontend**: `Vencimientos.jsx` y `VencimientosDashboard.jsx` existen y tienen historial real (commits "gráficas mejoradas", "versión con dashboard", última modificación ~2025-06-04), pero ni `App.jsx` tiene ruta `/vencimientos` ni `Navbar.jsx` tiene link — inalcanzable desde la UI actual. El backend (`/api/vencimientos`, `remoteClient.js`) sí está limpio y montado (usa `pg` normal, sin el riesgo de `node-adodb`).
+
+**Decisiones:**
+- No se toca código de Vencimientos por ahora — se rellenan `TU_HOST_REMOTO`/`TU_USUARIO`/`TU_PASSWORD`/`NOMBRE_DE_LA_BD` en Railway con los mismos valores del `.env` local (siguen siendo requeridos por `env.ts`, sin importar si el frontend enruta a la página) para no bloquear el arranque, y se decide después si se reconecta la ruta en el frontend o se retira la función.
+
+**Bloqueos / dudas:**
+- Pendiente decidir el futuro de Vencimientos: ¿reconectar `/vencimientos` en `App.jsx`/`Navbar.jsx`, o considerarla obsoleta y retirar ruta+páginas+variables de entorno?
+- Los 73 archivos sin commitear (Fase 1-B, 1-C, sesión de hoy) siguen pendientes de revisión y push por parte del usuario — Railway está construyendo desde `origin/main` con código viejo hasta que eso se resuelva.
+
+**Siguiente paso:**
+- Terminar de llenar variables en Railway (paso 3 del checklist) y reintentar el deploy.
+- Cuando el usuario termine de revisar el diff, commitear y pushear a `origin/main` para que Railway tome el código corregido de esta sesión.
+
+---
+
 ## 2026-08-27 — Fix: `validateSchema.js` con ruta de require incorrecta (crash de arranque)
 
 **Hecho:**
